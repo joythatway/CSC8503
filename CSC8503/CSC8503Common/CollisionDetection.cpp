@@ -67,6 +67,7 @@ bool CollisionDetection::RayCapsuleIntersection(const Ray& r, const Transform& w
 }
 
 bool CollisionDetection::RaySphereIntersection(const Ray&r, const Transform& worldTransform, const SphereVolume& volume, RayCollision& collision) {
+	
 	return false;
 }
 
