@@ -1,4 +1,6 @@
 #include "Win32Mouse.h"
+#include <algorithm>
+#include <iostream>
 #ifdef _WIN32
 
 using namespace NCL;
