@@ -47,6 +47,7 @@ namespace NCL {
 			float	globalDamping;
 
 			std::set<CollisionDetection::CollisionInfo> allCollisions;
+			std::set<CollisionDetection::CollisionInfo> broadphaseCollisions;//tutorial spatial acceleration structures
 
 			bool useBroadPhase		= true;
 			int numCollisionFrames	= 5;

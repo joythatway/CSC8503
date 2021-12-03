@@ -152,5 +152,8 @@
     <ClCompile Include="QuadTree.cpp">
       <Filter>CollisionDetection</Filter>
     </ClCompile>
+    <ClCompile Include="PositionConstrain.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
