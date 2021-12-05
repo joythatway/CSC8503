@@ -6,6 +6,8 @@
 #include "../../Common/TextureLoader.h"
 #include "..//CSC8503Common/PositionConstraint.h"
 
+#include "../CSC8503Common/StateGameObject.h"
+
 using namespace NCL;
 using namespace CSC8503;
 
@@ -103,6 +105,12 @@ void TutorialGame::UpdateGame(float dt) {
 
 		//Debug::DrawAxisLines(lockedObject->GetTransform().GetMatrix(), 2.0f);
 	}
+
+	//state machine code begin
+	if (testStateObject) {
+		testStateObject->Update(dt);
+	}
+	//state machine code end
 
 	world->UpdateWorld(dt);
 	renderer->Update(dt);
@@ -249,6 +257,7 @@ void TutorialGame::InitWorld() {
 	InitGameExamples();
 	InitDefaultFloor();
 	BridgeConstraintTest();//!!!s
+	testStateObject = AddStateObjectToWorld(Vector3(0, 10, 0));//state machine code
 }
 
 void TutorialGame::BridgeConstraintTest() {
@@ -476,6 +485,25 @@ GameObject* TutorialGame::AddEnemyToWorld(const Vector3& position) {
 
 GameObject* TutorialGame::AddBonusToWorld(const Vector3& position) {
 	GameObject* apple = new GameObject();
+
+	SphereVolume* volume = new SphereVolume(0.25f);
+	apple->SetBoundingVolume((CollisionVolume*)volume);
+	apple->GetTransform()
+		.SetScale(Vector3(0.25, 0.25, 0.25))
+		.SetPosition(position);
+
+	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, nullptr, basicShader));
+	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
+
+	apple->GetPhysicsObject()->SetInverseMass(1.0f);
+	apple->GetPhysicsObject()->InitSphereInertia();
+
+	world->AddGameObject(apple);
+
+	return apple;
+}
+StateGameObject* TutorialGame::AddStateObjectToWorld(const Vector3& position) {//state machine code
+	StateGameObject* apple = new StateGameObject();
 
 	SphereVolume* volume = new SphereVolume(0.25f);
 	apple->SetBoundingVolume((CollisionVolume*)volume);

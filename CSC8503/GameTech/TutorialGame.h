@@ -1,6 +1,7 @@
 #pragma once
 #include "GameTechRenderer.h"
 #include "../CSC8503Common/PhysicsSystem.h"
+#include "../CSC8503Common/StateGameObject.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -12,6 +13,11 @@ namespace NCL {
 			virtual void UpdateGame(float dt);
 
 		protected:
+			//state machine begin
+			StateGameObject* AddStateObjectToWorld(const Vector3& position);
+			StateGameObject* testStateObject;
+			//state machine end
+
 			void InitialiseAssets();
 
 			void InitCamera();
