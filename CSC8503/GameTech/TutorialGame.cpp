@@ -246,6 +246,7 @@ void TutorialGame::InitCamera() {
 	world->GetMainCamera()->SetPitch(-15.0f);
 	world->GetMainCamera()->SetYaw(315.0f);
 	world->GetMainCamera()->SetPosition(Vector3(-60, 40, 60));
+	//world->GetMainCamera()->SetPosition(Vector3(500, 500, 500));//test for constrains and solvers
 	lockedObject = nullptr;
 }
 
@@ -267,7 +268,7 @@ void TutorialGame::BridgeConstraintTest() {
 	float maxDistance = 30; // constraint distance
 	float cubeDistance = 20; // distance between links
 
-	Vector3 startPos = Vector3(50, 50, 50);
+	Vector3 startPos = Vector3(500, 500, 500);
 	GameObject* start = AddCubeToWorld(startPos + Vector3(0, 0, 0), cubeSize, 0);
 	GameObject* end = AddCubeToWorld(startPos + Vector3((numLinks + 2) * cubeDistance, 0, 0), cubeSize, 0);
 	GameObject* previous = start;
