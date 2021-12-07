@@ -8,13 +8,20 @@ namespace NCL {
 		class PushdownMachine
 		{
 		public:
-			PushdownMachine();
-			~PushdownMachine();
+			//PushdownMachine();
+			PushdownMachine(PushdownState* initialState) {//Pushdown Automata
+				this->initialState = initialState;
+			}
 
-			void Update();
+			~PushdownMachine() {};
+
+			bool Update(float dt);//Pushdown Automata
+			//void Update();
 
 		protected:
-			PushdownState * activeState;
+			PushdownState* activeState;
+
+			PushdownState* initialState;//Pushdown Automata
 
 			std::stack<PushdownState*> stateStack;
 		};

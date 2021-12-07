@@ -11,6 +11,8 @@
 #include "../CSC8503Common/BehaviourAction.h"
 #include "../CSC8503Common/BehaviourSelector.h"
 #include "../CSC8503Common/BehaviourSequence.h"
+#include "..//CSC8503Common/PushdownMachine.h"
+#include "..//CSC8503Common/PushdownState.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -29,7 +31,7 @@ hide or show the
 */
 
 //Pushdown Automata begin
-/**
+
 class PauseScreen : public PushdownState {
 	PushdownResult OnUpdate(float dt, PushdownState** newState) override {
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::U)) {
@@ -96,7 +98,7 @@ void TestPushdownAutomata(Window* w) {
 		}
 	}
 }
-*/
+
 //Pushdown Automata end
 
 
@@ -284,6 +286,7 @@ int main() {
 
 
 	TestPathfinding();//path finding
+	//TestPushdownAutomata(w);//Pushdown Automata
 
 	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyboardKeys::ESCAPE)) {
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();
@@ -304,10 +307,13 @@ int main() {
 
 		DisplayPathfinding();//path finding
 		TestBehaviourTree();//Behaviour Trees
+		//TestPushdownAutomata(w);//Pushdown Automata
 
 		w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
 
 		g->UpdateGame(dt);
+		
 	}
+	TestPushdownAutomata(w);//Pushdown Automata
 	Window::DestroyGameWindow();
 }
