@@ -25,7 +25,7 @@ void PositionConstraint::UpdateConstraint(float dt) {
 			Vector3 bImpulse = -offsetDir * lambda;
 
 			physA->ApplyLinearImpulse(aImpulse); 
-			physA->ApplyLinearImpulse(aImpulse);
+			physB->ApplyLinearImpulse(bImpulse);
 		}
 	}
 }

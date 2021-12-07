@@ -5,7 +5,9 @@ namespace NCL {
 		class Constraint	{
 		public:
 			Constraint() {}
-			virtual ~Constraint() {}
+			//virtual ~Constraint() {}
+
+			~Constraint() {}//Constraints and Solvers
 
 			virtual void UpdateConstraint(float dt) = 0;
 		};

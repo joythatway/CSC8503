@@ -314,6 +314,6 @@ int main() {
 		g->UpdateGame(dt);
 		
 	}
-	TestPushdownAutomata(w);//Pushdown Automata
+	//TestPushdownAutomata(w);//Pushdown Automata
 	Window::DestroyGameWindow();
 }
