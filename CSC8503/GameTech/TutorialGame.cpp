@@ -307,7 +307,47 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 
 	return floor;
 }
+//add wall to world
+GameObject* TutorialGame::AddWallToWorld(const Vector3& position) {
+	GameObject* floor = new GameObject();
 
+	Vector3 floorSize = Vector3(1, 10, 100);
+	AABBVolume* volume = new AABBVolume(floorSize);
+	floor->SetBoundingVolume((CollisionVolume*)volume);
+	floor->GetTransform()
+		.SetScale(floorSize * 2)
+		.SetPosition(position);
+
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
+	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
+
+	floor->GetPhysicsObject()->SetInverseMass(0);
+	floor->GetPhysicsObject()->InitCubeInertia();
+
+	world->AddGameObject(floor);
+
+	return floor;
+}//add wall to world
+GameObject* TutorialGame::AddWallRLToWorld(const Vector3& position) {
+	GameObject* floor = new GameObject();
+
+	Vector3 floorSize = Vector3(100, 10, 1);
+	AABBVolume* volume = new AABBVolume(floorSize);
+	floor->SetBoundingVolume((CollisionVolume*)volume);
+	floor->GetTransform()
+		.SetScale(floorSize * 2)
+		.SetPosition(position);
+
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
+	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
+
+	floor->GetPhysicsObject()->SetInverseMass(0);
+	floor->GetPhysicsObject()->InitCubeInertia();
+
+	world->AddGameObject(floor);
+
+	return floor;
+}//add wall to world
 /*
 
 Builds a game object that uses a sphere mesh for its graphics, and a bounding sphere for its
@@ -420,6 +460,10 @@ void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing,
 
 void TutorialGame::InitDefaultFloor() {
 	AddFloorToWorld(Vector3(0, -2, 0));
+	AddWallToWorld(Vector3(100, 10, 0));//wall top
+	AddWallToWorld(Vector3(-100, 10, 0));//wall bottom
+	AddWallRLToWorld(Vector3(0, 10, 100));//wall right
+	AddWallRLToWorld(Vector3(0, 10, -100));//wall left
 }
 
 void TutorialGame::InitGameExamples() {

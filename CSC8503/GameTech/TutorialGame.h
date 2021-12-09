@@ -39,6 +39,9 @@ namespace NCL {
 			void LockedObjectMovement();
 
 			GameObject* AddFloorToWorld(const Vector3& position);
+			GameObject* AddWallToWorld(const Vector3& position);//add wall to world
+			GameObject* AddWallRLToWorld(const Vector3& position);//add wall to world
+
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 			
