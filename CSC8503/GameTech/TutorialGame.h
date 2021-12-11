@@ -2,6 +2,9 @@
 #include "GameTechRenderer.h"
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "../CSC8503Common/StateGameObject.h"
+#include "../CSC8503Common/PushdownMachine.h"
+#include "../CSC8503Common/PushdownState.h"
+
 
 namespace NCL {
 	namespace CSC8503 {
@@ -11,11 +14,33 @@ namespace NCL {
 			~TutorialGame();
 
 			virtual void UpdateGame(float dt);
+			//coursework function begin
+			void DrawMenu();
+			void DrawWin();
+			void DrawLose(std::string winner);
+			void DrawPause();
+
+			bool UpdatePushdown(float dt) {
+				if (!machine->Update(dt)) {
+					return false;
+				}
+				return true;
+			}
+			//coursework function end
 
 		protected:
+			//coursework begin
+			PushdownMachine* machine;
+			std::string winnerName;
+			GameObject* player = nullptr;
+			bool multiplayer;
+
+			//coursework end
+			// 
 			//state machine begin
 			StateGameObject* AddStateObjectToWorld(const Vector3& position);
-			StateGameObject* testStateObject;
+			StateGameObject* testStateObject = nullptr;
+			StateGameObject* testStateObject1 = nullptr;//
 			//state machine end
 
 			void InitialiseAssets();
@@ -81,7 +106,141 @@ namespace NCL {
 				lockedObject = o;
 			}
 
+		//};//tutorialgame class 
+		class IntroScreen :public PushdownState {//for intro menu screen 
+		protected:
+			TutorialGame* tugame;
+		public:
+			IntroScreen(TutorialGame* tugame) {
+				this->tugame = tugame;
+			}
+			PushdownResult OnUpdate(float dt, PushdownState** newstate) override {
+				//if (Window::GetKeyboard()->KeyDown(KeyboardKeys::P)) {
+				//	*newstate = new GameScreen(tugame, 0);
+				//	return PushdownResult::Push;
+				//}
+				if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM1)) {
+					*newstate = new GameScreen(tugame, 1);
+					return PushdownResult::Push;
+				}
+				if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM2)) {
+					// game mode 2
+				}
+				if (Window::GetKeyboard()->KeyDown(KeyboardKeys::ESCAPE)) {
+					return PushdownResult::Pop;
+				}
+
+				tugame->DrawMenu();
+				//tugame->UpdateGame(0);
+
+				return PushdownState::NoChange;
+			}
+			void OnAwake() override {
+				std::cout << "Press 1 to play single player or 2 for multiplayer. ESC to quit\n";
+			}
+
+			void OnSleep() override {
+				tugame->InitialiseAssets();
+			}
 		};
+		/*
+		class WinGame :public PushdownState {//for win the game screen 
+
+		};*/
+		
+		class LoseGame :public PushdownState {//for lose game screen 
+		protected:
+			TutorialGame* tugame;
+			std::string winner;
+		public:
+			LoseGame(TutorialGame* tugame, std::string winner) {
+				this->tugame = tugame;
+				this->winner = winner;
+			}
+
+			PushdownResult OnUpdate(float dt, PushdownState** newState) override {
+				if (Window::GetKeyboard()->KeyDown(KeyboardKeys::M)) {
+					tugame->machine->Set(new IntroScreen(tugame));
+					
+				}
+
+				tugame->DrawLose(winner);
+
+				return PushdownState::NoChange;
+			}
+
+			void OnAwake() override {
+				std::cout << "Press 1 to play single player or 2 for multiplayer. ESC to quit\n";
+			}
+
+			void OnSleep() override {
+				tugame->InitialiseAssets();
+			}
+		};
+		class GameScreen :public PushdownState {
+		protected:
+			TutorialGame* tugame;
+			float pausesave = 1;
+			bool multiplayer;
+		public:
+			GameScreen(TutorialGame* tugame, bool multiplayer = 0) {
+				tugame->multiplayer = multiplayer;
+				this->tugame = tugame;
+			}
+			PushdownResult OnUpdate(float dt, PushdownState** newstate) override {
+				if (!tugame->winnerName.empty()) {
+					std::cout << "win\n";
+					*newstate = new LoseGame(tugame, tugame->winnerName);
+					return PushdownResult::Push;
+				}
+
+				if (pausesave < 0) {
+					if (Window::GetKeyboard()->KeyDown(KeyboardKeys::M)) {
+						return PushdownResult::Pop;
+					}
+					if (Window::GetKeyboard()->KeyDown(KeyboardKeys::ESCAPE)) {
+						*newstate = new PauseScreen(tugame);
+						return PushdownResult::Push;
+					}
+				}
+				else {
+					pausesave -= dt;
+				}
+				tugame->UpdateGame(dt);
+
+				return PushdownResult::NoChange;
+			}
+			void OnAwake() override {
+				std::cout << "Resuming Game\n";
+				pausesave = 0.2;
+			}
+		};
+		class PauseScreen :public PushdownState {//for player press pause buttom screen 
+		protected:
+			TutorialGame* tugame;
+			float pausesave = 1;
+		public:
+			PauseScreen(TutorialGame* tugame) {
+				this->tugame = tugame;
+			}
+			PushdownResult OnUpdate(float dt, PushdownState** newstate) override {
+				if (pausesave < 0) {
+					if (Window::GetKeyboard()->KeyDown(KeyboardKeys::ESCAPE)) {
+						return PushdownResult::Pop;
+					}
+				}
+				else {
+					pausesave -= dt;
+				}
+				tugame->UpdateGame(0);
+				return PushdownResult::NoChange;
+			}
+			void OnAwake() override{
+				std::cout << "press esc to pause game" << std::endl;
+				pausesave = 0.2;
+			}
+		};
+		};//tutorialgame class end
 	}
 }
 

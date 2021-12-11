@@ -282,14 +282,16 @@ int main() {
 	w->LockMouseToWindow(true);
 
 	TutorialGame* g = new TutorialGame();
+
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 
 
-	TestPathfinding();//path finding
+	//TestPathfinding();//path finding
 	//TestPushdownAutomata(w);//Pushdown Automata
-
-	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyboardKeys::ESCAPE)) {
-		float dt = w->GetTimer()->GetTimeDeltaSeconds();
+	float dt = 0;
+	//while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyboardKeys::ESCAPE)) {
+	while (w->UpdateWindow() && g->UpdatePushdown(dt)) {
+		 dt = w->GetTimer()->GetTimeDeltaSeconds();
 		if (dt > 0.1f) {
 			std::cout << "Skipping large time delta" << std::endl;
 			continue; //must have hit a breakpoint or something to have a 1 second frame time!
@@ -305,13 +307,13 @@ int main() {
 			w->SetWindowPosition(0, 0);
 		}
 
-		DisplayPathfinding();//path finding
-		TestBehaviourTree();//Behaviour Trees
-		//TestPushdownAutomata(w);//Pushdown Automata
+		//DisplayPathfinding();//path finding
+		//TestBehaviourTree();//Behaviour Trees
+		
 
 		w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
 
-		g->UpdateGame(dt);
+		//g->UpdateGame(dt);//if use pushdown automata, do not use this 
 		
 	}
 	//TestPushdownAutomata(w);//Pushdown Automata

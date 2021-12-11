@@ -17,6 +17,7 @@ namespace NCL {
 
 			bool Update(float dt);//Pushdown Automata
 			//void Update();
+			void Set(PushdownState* freshState);
 
 		protected:
 			PushdownState* activeState;

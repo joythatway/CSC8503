@@ -35,7 +35,15 @@ bool PushdownMachine::Update(float dt) {
 	}
 	return true;
 }
-
+void NCL::CSC8503::PushdownMachine::Set(PushdownState* freshState)
+{
+	while (!stateStack.empty()) {
+		stateStack.pop();
+	}
+	stateStack.push(freshState);
+	initialState = freshState;
+	activeState = initialState;
+}
 
 
 
