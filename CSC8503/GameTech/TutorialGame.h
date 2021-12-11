@@ -19,6 +19,8 @@ namespace NCL {
 			void DrawWin();
 			void DrawLose(std::string winner);
 			void DrawPause();
+			void InitGameWorld1();//ball
+			void InitGameWorld2();//maze
 
 			bool UpdatePushdown(float dt) {
 				if (!machine->Update(dt)) {
@@ -110,6 +112,7 @@ namespace NCL {
 		class IntroScreen :public PushdownState {//for intro menu screen 
 		protected:
 			TutorialGame* tugame;
+			bool GameMode = 0;
 		public:
 			IntroScreen(TutorialGame* tugame) {
 				this->tugame = tugame;
@@ -120,11 +123,15 @@ namespace NCL {
 				//	return PushdownResult::Push;
 				//}
 				if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM1)) {
-					*newstate = new GameScreen(tugame, 1);
+					*newstate = new GameScreen(tugame, 0);
+					GameMode = 0;
 					return PushdownResult::Push;
 				}
 				if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM2)) {
 					// game mode 2
+					*newstate = new GameScreen(tugame, 1);
+					GameMode = 1;
+					return PushdownResult::Push;
 				}
 				if (Window::GetKeyboard()->KeyDown(KeyboardKeys::ESCAPE)) {
 					return PushdownResult::Pop;
@@ -140,7 +147,13 @@ namespace NCL {
 			}
 
 			void OnSleep() override {
-				tugame->InitialiseAssets();
+				if (GameMode == 0) {//mode 1 game ball
+					tugame->InitialiseAssets();
+				}
+				if (GameMode == 1) {//mode 2 maze ball
+					std::cout << "game mode 2 here " << std::endl;
+					tugame->InitGameWorld2();//just call gamemode2 function in here
+				}
 			}
 		};
 		/*
@@ -233,6 +246,7 @@ namespace NCL {
 					pausesave -= dt;
 				}
 				tugame->UpdateGame(0);
+				//tugame->DrawPause();
 				return PushdownResult::NoChange;
 			}
 			void OnAwake() override{

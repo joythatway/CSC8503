@@ -705,4 +705,10 @@ void TutorialGame::DrawLose(std::string winnner) {
 void TutorialGame::DrawPause() {
 	renderer->DrawString("now game paused", Vector2(10, 10));
 }
+void TutorialGame::InitGameWorld1() {
+	InitialiseAssets();//add assets first
+}
+void TutorialGame::InitGameWorld2() {
+	InitialiseAssets();//add assets first
+}
 //coursework function end
