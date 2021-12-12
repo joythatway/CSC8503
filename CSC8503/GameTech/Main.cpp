@@ -271,7 +271,7 @@ void TestStateMachine() {
 	}
 }
 
-/*
+
 int main() {//pushdown main
 	Window*w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
 
@@ -320,7 +320,8 @@ int main() {//pushdown main
 	//TestPushdownAutomata(w);//Pushdown Automata
 	Window::DestroyGameWindow();
 }
-*/
+
+/*
 int main() {
 	Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
 
@@ -359,3 +360,4 @@ int main() {
 	}
 	Window::DestroyGameWindow();
 }
+*/

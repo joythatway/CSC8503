@@ -61,6 +61,9 @@ namespace NCL {
 			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
 			void InitDefaultFloor();
 			void BridgeConstraintTest();
+			void Bridge(Vector3 startpos);//bridge
+			void AddJumpPad(Vector3 pos);//jump
+			void AddIcePad(Vector3 pos);//speed up
 	
 			bool SelectObject();
 			void MoveSelectedObject();
@@ -150,7 +153,7 @@ namespace NCL {
 
 			void OnSleep() override {
 				if (GameMode == 0) {//mode 1 game ball
-					tugame->InitialiseAssets();
+					tugame->InitGameWorld1();
 				}
 				if (GameMode == 1) {//mode 2 maze ball
 					std::cout << "game mode 2 here " << std::endl;

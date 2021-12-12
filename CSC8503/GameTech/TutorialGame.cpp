@@ -52,7 +52,7 @@ void TutorialGame::InitialiseAssets() {
 	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
 
 	InitCamera();
-	InitWorld();
+	//InitWorld();//when initgame1 and initgame2 func done, donot call this func
 }
 
 TutorialGame::~TutorialGame()	{
@@ -286,7 +286,27 @@ void TutorialGame::BridgeConstraintTest() {
 	PositionConstraint* constraint = new PositionConstraint(previous, end, maxDistance);
 	world->AddConstraint(constraint);
 }
+void TutorialGame::Bridge(Vector3 startpos) {//make this like the real bridge
+	Vector3 cubeSize = Vector3(1, 0.2, 3);
+	float invCubeMass = 5; //how heavy the middle pieces are
+	int numLinks = 25;
+	float maxDistance = 2; // constraint distance
+	float cubeDistance = 2; // distance between links
 
+	Vector3 startPos = startpos;
+	//Vector3 startPos = Vector3(0, 5, 0);
+	GameObject* start = AddCubeToWorld(startPos + Vector3(0, 0, 0), cubeSize, 0);
+	GameObject* end = AddCubeToWorld(startPos + Vector3((numLinks + 2) * cubeDistance, 0, 0), cubeSize, 0);
+	GameObject* previous = start;
+	for (int i = 0; i < numLinks; ++i) {
+		GameObject* block = AddCubeToWorld(startPos + Vector3((i + 1) * cubeDistance, 0, 0), cubeSize, invCubeMass);
+		PositionConstraint* constraint = new PositionConstraint(previous, block, maxDistance);
+		world->AddConstraint(constraint);
+		previous = block;
+	}
+	PositionConstraint* constraint = new PositionConstraint(previous, end, maxDistance);
+	world->AddConstraint(constraint);
+}
 /*
 
 A single function to add a large immoveable cube to the bottom of our world
@@ -724,10 +744,37 @@ void TutorialGame::DrawLose(std::string winnner) {
 void TutorialGame::DrawPause() {
 	renderer->DrawString("now game paused", Vector2(10, 10));
 }
-void TutorialGame::InitGameWorld1() {
+void TutorialGame::InitGameWorld1() {//ball
 	InitialiseAssets();//add assets first
+
+	world->ClearAndErase();
+	physics->Clear();
+
+	//InitGameExamples();
+	InitDefaultFloor();
+	//BridgeConstraintTest();//!!!s
+	Bridge(Vector3(50,5,50));
+	AddCubeToWorld(Vector3(-80, 0, 0), Vector3(3, 3, 3), 0.0f);
+	AddSphereToWorld(Vector3(-78, 10, 0), 2.5, 1.0f);
+	testStateObject = AddStateObjectToWorld(Vector3(0, 10, 0));//state machine code
+	testStateObject1 = AddStateObjectToWorld(Vector3(0, 20, 0));//state machine code
 }
-void TutorialGame::InitGameWorld2() {
+void TutorialGame::InitGameWorld2() {//maze
 	InitialiseAssets();//add assets first
+	world->ClearAndErase();
+	physics->Clear();
+
+	
+	InitGameExamples();
+	InitDefaultFloor();
+	BridgeConstraintTest();//!!!s
+	testStateObject = AddStateObjectToWorld(Vector3(0, 10, 0));//state machine code
+	testStateObject1 = AddStateObjectToWorld(Vector3(0, 20, 0));//state machine code
+}
+void TutorialGame::AddJumpPad(Vector3 pos) {
+
+}
+void TutorialGame::AddIcePad(Vector3 pos) {
+
 }
 //coursework function end
