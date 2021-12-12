@@ -717,6 +717,51 @@ void TutorialGame::MoveSelectedObject() {
 			}
 		}
 	}
+	//use WASD to move selectedobject code begin
+	if (!selectionObject) {
+		return;
+	}
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::TAB))
+	{
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::W)) {
+			selectionObject->GetPhysicsObject()->AddForce(Vector3(1, 0, 0) * forceMagnitude*0.02f);
+		}
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::S)) {
+			selectionObject->GetPhysicsObject()->AddForce(Vector3(-1, 0, 0) * forceMagnitude * 0.02f);
+		}
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::A)) {
+			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, -1) * forceMagnitude * 0.02f);
+		}
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::D)) {
+			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 0, 1) * forceMagnitude * 0.02f);
+		}
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SPACE)) {
+			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, -1, 0) * forceMagnitude * 0.02f);
+		}
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SHIFT)) {
+			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, 1, 0) * forceMagnitude * 0.02f);
+		}
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::Q)) {//lets rotate
+			selectionObject->GetPhysicsObject()->AddTorque(Vector3(1, 0, 0) * forceMagnitude * 0.02f);
+		}
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::E)) {
+			selectionObject->GetPhysicsObject()->AddTorque(Vector3(-1, 0, 0) * forceMagnitude * 0.02f);
+		}
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::R)) {
+			selectionObject->GetPhysicsObject()->AddTorque(Vector3(0, 1, 0) * forceMagnitude * 0.02f);
+		}
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::F)) {
+			selectionObject->GetPhysicsObject()->AddTorque(Vector3(0, -1, 0) * forceMagnitude * 0.02f);
+		}
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::J)) {
+			selectionObject->GetPhysicsObject()->AddTorque(Vector3(0, 0, 1) * forceMagnitude * 0.02f);
+		}
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::K)) {
+			selectionObject->GetPhysicsObject()->AddTorque(Vector3(0, 0, -1) * forceMagnitude * 0.02f);
+		}
+		
+	}
+	//use WASD to move selectedobject code end
 }
 
 //coursework function begin
