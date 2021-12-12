@@ -111,8 +111,8 @@ void TutorialGame::UpdateGame(float dt) {
 
 		//state machine code begin
 		if (testStateObject) {
-			//testStateObject->Update(dt);
-			//testStateObject1->Update(dt);
+			testStateObject->Update(dt);
+			testStateObject1->Update(dt);
 		}
 		//state machine code end
 		world->UpdateWorld(dt);
@@ -258,7 +258,7 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	InitMixedGridWorld(5, 5, 3.5f, 3.5f);
+	//InitMixedGridWorld(5, 5, 3.5f, 3.5f);//create rand cube and sphere
 	InitGameExamples();
 	InitDefaultFloor();
 	BridgeConstraintTest();//!!!s
@@ -555,6 +555,25 @@ GameObject* TutorialGame::AddBonusToWorld(const Vector3& position) {
 	return apple;
 }
 StateGameObject* TutorialGame::AddStateObjectToWorld(const Vector3& position) {//state machine code
+	StateGameObject* apple = new StateGameObject();
+
+	SphereVolume* volume = new SphereVolume(0.25f);
+	apple->SetBoundingVolume((CollisionVolume*)volume);
+	apple->GetTransform()
+		.SetScale(Vector3(0.25, 0.25, 0.25))
+		.SetPosition(position);
+
+	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, nullptr, basicShader));
+	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
+
+	apple->GetPhysicsObject()->SetInverseMass(1.0f);
+	apple->GetPhysicsObject()->InitSphereInertia();
+
+	world->AddGameObject(apple);
+
+	return apple;
+}
+StateGameObject* TutorialGame::AddStateWallToWorld(const Vector3& position) {//state machine code for auto up and down wall
 	StateGameObject* apple = new StateGameObject();
 
 	SphereVolume* volume = new SphereVolume(0.25f);

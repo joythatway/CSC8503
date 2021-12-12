@@ -13,6 +13,7 @@
 #include "../CSC8503Common/BehaviourSequence.h"
 #include "..//CSC8503Common/PushdownMachine.h"
 #include "..//CSC8503Common/PushdownState.h"
+#include "coursework.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -270,8 +271,8 @@ void TestStateMachine() {
 	}
 }
 
-
-int main() {
+/*
+int main() {//pushdown main
 	Window*w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
 
 	if (!w->HasInitialised()) {
@@ -317,5 +318,44 @@ int main() {
 		
 	}
 	//TestPushdownAutomata(w);//Pushdown Automata
+	Window::DestroyGameWindow();
+}
+*/
+int main() {
+	Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
+
+	if (!w->HasInitialised()) {
+		return -1;
+	}
+	srand(time(0));
+	w->ShowOSPointer(false);
+	w->LockMouseToWindow(true);
+
+	Coursework* g = new Coursework();
+	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
+
+	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyboardKeys::ESCAPE)) {
+		float dt = w->GetTimer()->GetTimeDeltaSeconds();
+
+		if (dt > 0.1f) {
+			std::cout << "Skipping large time delta" << std::endl;
+			continue; //must have hit a breakpoint or something to have a 1 second frame time!
+		}
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::PRIOR)) {
+			w->ShowConsole(true);
+		}
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::NEXT)) {
+			w->ShowConsole(false);
+		}
+
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::T)) {
+			w->SetWindowPosition(0, 0);
+		}
+
+		w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
+
+		//g->UpdateGame(dt);
+		g->gameState->Update(dt);
+	}
 	Window::DestroyGameWindow();
 }

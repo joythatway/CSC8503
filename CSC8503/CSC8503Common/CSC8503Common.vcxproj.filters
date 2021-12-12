@@ -123,6 +123,9 @@
     <ClInclude Include="BehaviourAction.h">
       <Filter>AI</Filter>
     </ClInclude>
+    <ClInclude Include="StateSystem.h">
+      <Filter>AI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameWorld.cpp">
@@ -174,6 +177,9 @@
       <Filter>Physics</Filter>
     </ClCompile>
     <ClCompile Include="StateGameObject.cpp">
+      <Filter>AI</Filter>
+    </ClCompile>
+    <ClCompile Include="StateSystem.cpp">
       <Filter>AI</Filter>
     </ClCompile>
   </ItemGroup>

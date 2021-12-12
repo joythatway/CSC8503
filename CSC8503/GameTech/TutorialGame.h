@@ -35,14 +35,16 @@ namespace NCL {
 			PushdownMachine* machine;
 			std::string winnerName;
 			GameObject* player = nullptr;
-			bool multiplayer;
+			bool multiplayer = 0;
 
 			//coursework end
 			// 
 			//state machine begin
+			StateGameObject* AddStateWallToWorld(const Vector3& position);
 			StateGameObject* AddStateObjectToWorld(const Vector3& position);
 			StateGameObject* testStateObject = nullptr;
 			StateGameObject* testStateObject1 = nullptr;//
+			StateGameObject* testStateWall1 = nullptr;//
 			//state machine end
 
 			void InitialiseAssets();
@@ -160,7 +162,7 @@ namespace NCL {
 		class WinGame :public PushdownState {//for win the game screen 
 
 		};*/
-		
+		/*
 		class LoseGame :public PushdownState {//for lose game screen 
 		protected:
 			TutorialGame* tugame;
@@ -190,6 +192,7 @@ namespace NCL {
 				tugame->InitialiseAssets();
 			}
 		};
+		*///LoseScreen class
 		class GameScreen :public PushdownState {
 		protected:
 			TutorialGame* tugame;
@@ -201,11 +204,11 @@ namespace NCL {
 				this->tugame = tugame;
 			}
 			PushdownResult OnUpdate(float dt, PushdownState** newstate) override {
-				if (!tugame->winnerName.empty()) {
+				/*if (!tugame->winnerName.empty()) {
 					std::cout << "win\n";
 					*newstate = new LoseGame(tugame, tugame->winnerName);
 					return PushdownResult::Push;
-				}
+				}*/
 
 				if (pausesave < 0) {
 					if (Window::GetKeyboard()->KeyDown(KeyboardKeys::M)) {

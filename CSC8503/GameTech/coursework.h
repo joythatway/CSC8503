@@ -1,6 +1,7 @@
 #pragma once
 #include "GameTechRenderer.h"
 #include "../CSC8503Common/PhysicsSystem.h"
+#include "../CSC8503Common/StateSystem.h"
 #include "../CSC8503Common/StateGameObject.h"
 #include "../CSC8503Common/PushdownMachine.h"
 #include "../CSC8503Common/PushdownState.h"
@@ -10,10 +11,10 @@
 
 namespace NCL {
 	namespace CSC8503 {
-		class TutorialGame {
+		class Coursework {
 		public:
-			TutorialGame();
-			~TutorialGame();
+			Coursework();
+			~Coursework();
 
 			virtual void UpdateGame(float dt);
 			//coursework function begin
@@ -43,7 +44,10 @@ namespace NCL {
 			StateGameObject* AddStateObjectToWorld(const Vector3& position);
 			StateGameObject* testStateObject = nullptr;
 			StateGameObject* testStateObject1 = nullptr;//
+
+			StateSystem* machines;
 			//state machine end
+
 
 			void InitialiseAssets();
 
