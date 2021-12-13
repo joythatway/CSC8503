@@ -15,6 +15,7 @@ namespace NCL {
 
 			virtual void UpdateGame(float dt);
 			//coursework function begin
+			bool isSelected = false;
 			void DrawMenu();
 			void DrawWin();
 			void DrawLose(std::string winner);
@@ -36,11 +37,13 @@ namespace NCL {
 			std::string winnerName;
 			GameObject* player = nullptr;
 			bool multiplayer = 0;
-
+			bool gameoneortwo = 0;
+			void BuildCubeWall(int xAxisNum,int zAxisNum, Vector3 startpos, int cubenum, Vector3 cubeDimension, float inverseMass);
 			//coursework end
 			// 
+			GameObject* AddSpherePlayerToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
 			//state machine begin
-			StateGameObject* AddStateWallToWorld(const Vector3& position);
+			StateGameObject* AddStateWallToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 0.0f);
 			StateGameObject* AddStateObjectToWorld(const Vector3& position);
 			StateGameObject* testStateObject = nullptr;
 			StateGameObject* testStateObject1 = nullptr;//
@@ -62,8 +65,8 @@ namespace NCL {
 			void InitDefaultFloor();
 			void BridgeConstraintTest();
 			void Bridge(Vector3 startpos);//bridge
-			void AddJumpPad(Vector3 pos);//jump
-			void AddIcePad(Vector3 pos);//speed up
+			GameObject* AddJumpPad(const Vector3& position, Vector3 dimensions, float inverseMass);//jump
+			GameObject* AddIcePad(const Vector3& position, Vector3 dimensions, float inverseMass);//speed up
 	
 			bool SelectObject();
 			void MoveSelectedObject();
@@ -93,6 +96,7 @@ namespace NCL {
 			float		forceMagnitude;
 
 			GameObject* selectionObject = nullptr;
+			
 
 			OGLMesh*	capsuleMesh = nullptr;
 			OGLMesh*	cubeMesh	= nullptr;

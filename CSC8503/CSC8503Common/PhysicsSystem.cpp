@@ -5,7 +5,9 @@
 #include "../../Common/Quaternion.h"
 
 #include "Constraint.h"
-
+//#include "..//GameTech/TutorialGame.h"
+#include <iostream>
+#include <string>
 #include "Debug.h"
 
 #include <functional>
@@ -222,7 +224,45 @@ In tutorial 5, we start determining the correct response to a collision,
 so that objects separate back out. 
 
 */
+void PhysicsSystem::jumppad(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const{
+	PhysicsObject* physA = a.GetPhysicsObject();
+	PhysicsObject* physB = b.GetPhysicsObject();
+
+	float totalMass = physA->GetInverseMass() + physB->GetInverseMass();
+	if (totalMass == 0) {
+		return;
+	}
+	physB->ApplyLinearImpulse(Vector3(0,-1,0)*5);
+	physB->ApplyLinearImpulse(Vector3(1,0,0)*2);
+}
+void PhysicsSystem::icepad(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const {
+	PhysicsObject* physA = a.GetPhysicsObject();
+	PhysicsObject* physB = b.GetPhysicsObject();
+
+	float totalMass = physA->GetInverseMass() + physB->GetInverseMass();
+	if (totalMass == 0) {
+		return;
+	}
+	//physB->ApplyLinearImpulse(Vector3(0, -1, 0) * 5);
+	physB->ApplyLinearImpulse(Vector3(1, 0, 0) * 3);
+	physB->ApplyLinearImpulse(Vector3(0, 1, 0) * 1);
+	physB->ApplyAngularImpulse(Vector3(0, 0, -1) * 3);
+}
 void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const {
+
+	if (a.GetName() == "jumppad" && b.GetName() == "sphereplayer") {
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::Z)) {
+			jumppad(a, b, p);
+		}
+	}
+	if (a.GetName() == "icepad" && b.GetName() == "sphereplayer") {
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::Z)) {
+			icepad(a, b, p);
+		}
+	}
+
+
+
 	PhysicsObject* physA = a.GetPhysicsObject();
 	PhysicsObject* physB = b.GetPhysicsObject();
 
