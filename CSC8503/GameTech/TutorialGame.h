@@ -38,7 +38,7 @@ namespace NCL {
 			GameObject* player = nullptr;
 			bool multiplayer = 0;
 			bool gameoneortwo = 0;
-			void BuildCubeWall(int xAxisNum,int zAxisNum, Vector3 startpos, int cubenum, Vector3 cubeDimension, float inverseMass);
+			void BuildCubeWall(float xAxisNum,float zAxisNum, Vector3 startpos, int cubenum, Vector3 cubeDimension, float inverseMass);
 			//coursework end
 			// 
 			GameObject* AddSpherePlayerToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
@@ -67,6 +67,7 @@ namespace NCL {
 			void Bridge(Vector3 startpos);//bridge
 			GameObject* AddJumpPad(const Vector3& position, Vector3 dimensions, float inverseMass);//jump
 			GameObject* AddIcePad(const Vector3& position, Vector3 dimensions, float inverseMass);//speed up
+			GameObject* AddEndPad(const Vector3& position, Vector3 dimensions, float inverseMass);//End condition
 	
 			bool SelectObject();
 			void MoveSelectedObject();

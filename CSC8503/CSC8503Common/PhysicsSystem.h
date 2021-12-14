@@ -9,6 +9,8 @@ namespace NCL {
 			PhysicsSystem(GameWorld& g);
 			~PhysicsSystem();
 
+			
+
 			void Clear();
 
 			void Update(float dt);
@@ -40,6 +42,8 @@ namespace NCL {
 			void ImpulseResolveCollision(GameObject& a , GameObject&b, CollisionDetection::ContactPoint& p) const;
 			void jumppad(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const;
 			void icepad(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const;
+			void Endpad(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const;
+			
 
 			GameWorld& gameWorld;
 
@@ -53,6 +57,7 @@ namespace NCL {
 
 			bool useBroadPhase		= true;
 			int numCollisionFrames	= 5;
+			
 		};
 	}
 }

@@ -6,6 +6,7 @@
 
 #include "Constraint.h"
 //#include "..//GameTech/TutorialGame.h"
+
 #include <iostream>
 #include <string>
 #include "Debug.h"
@@ -13,6 +14,7 @@
 #include <functional>
 using namespace NCL;
 using namespace CSC8503;
+class TutorialGame;
 
 /*
 
@@ -69,8 +71,12 @@ being at a low rate.
 */
 int realHZ		= idealHZ;
 float realDT	= idealDT;
+bool winorlose = false;
 
 void PhysicsSystem::Update(float dt) {	
+	if (winorlose == true) {
+		Debug::Print("Win!!!", Vector2(50, 50),Vector4(1,1,1,1));
+	}
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::B)) {
 		useBroadPhase = !useBroadPhase;
 		std::cout << "Setting broadphase to " << useBroadPhase << std::endl;
@@ -248,6 +254,28 @@ void PhysicsSystem::icepad(GameObject& a, GameObject& b, CollisionDetection::Con
 	physB->ApplyLinearImpulse(Vector3(0, 1, 0) * 1);
 	physB->ApplyAngularImpulse(Vector3(0, 0, -1) * 3);
 }
+void PhysicsSystem::Endpad(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const {
+	PhysicsObject* physA = a.GetPhysicsObject();
+	PhysicsObject* physB = b.GetPhysicsObject();
+
+	float totalMass = physA->GetInverseMass() + physB->GetInverseMass();
+	if (totalMass == 0) {
+		return;
+	}
+	//physB->ApplyLinearImpulse(Vector3(0, -1, 0) * 5);
+	//physB->ApplyLinearImpulse(Vector3(1, 0, 0) * 3);
+	//physB->ApplyLinearImpulse(Vector3(0, 1, 0) * 1);
+	//physB->ApplyAngularImpulse(Vector3(0, 0, -1) * 3);
+
+	//physB->SetInverseMass(0.0f);
+	//physB->ClearForces();
+	//physA->ClearForces();
+	//physA->SetElasticity(0);
+	//OGLRenderer::DrawString("heleo", Vector2(20, 20));
+	winorlose = true;
+	//Debug::Print("Win!!!", Vector2(50,50));
+	
+}
 void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const {
 
 	if (a.GetName() == "jumppad" && b.GetName() == "sphereplayer") {
@@ -259,6 +287,10 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::Z)) {
 			icepad(a, b, p);
 		}
+	}
+	if (a.GetName() == "Endpad" && b.GetName() == "sphereplayer") {
+		// end condition
+		Endpad(a,b,p);
 	}
 
 

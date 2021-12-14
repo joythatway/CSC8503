@@ -670,6 +670,22 @@ bool TutorialGame::SelectObject() {
 					name = selectionObject->GetName();
 					renderer->DrawString(name, Vector2(10, 15));
 				}
+				Quaternion tempnum;
+				tempnum=selectionObject->GetTransform().GetOrientation();
+				//float x, y, z, w;
+				string sx, sy, sz, sw, all;
+				float ox = tempnum.x;
+				float oy = tempnum.y;
+				float oz = tempnum.z;
+				float ow = tempnum.w;
+				sx = std::to_string(ox);
+				sy = std::to_string(oy);
+				sz = std::to_string(oz);
+				sw = std::to_string(ow);
+				//all = sx;
+				all = "Orit (" + sx + ',' + sy + ',' + sz + ',' + sw + ')';
+				renderer->DrawString(all, Vector2(10, 25));
+
 				//add draw information function here
 				selectionObject = nullptr;
 				lockedObject	= nullptr;
@@ -831,6 +847,7 @@ void TutorialGame::InitGameWorld1() {//ball
 	testStateObject1 = AddStateWallToWorld(Vector3(-20, 0, -8), Vector3(3, 3, 3), 10.0f);//state machine code
 	AddIcePad(Vector3(3, 0, 0), Vector3(15, 6, 3), 0.0f);
 	Bridge(Vector3(23,5,0));
+	AddEndPad(Vector3(100, 10, 0), Vector3(3, 20, 20), 0.0f);
 	
 }
 void TutorialGame::InitGameWorld2() {//maze
@@ -841,6 +858,7 @@ void TutorialGame::InitGameWorld2() {//maze
 	//InitGameExamples();
 	//InitDefaultFloor();
 	AddFloorToWorld(Vector3(0, -2, 0));
+	BuildCubeWall(10, 1, Vector3(-100, 0, -100), 10, Vector3(10, 10, 10), 0.0f);
 	//InitCubeGridWorld(2,10,10,10,Vector3(5,5,5));
 	//BridgeConstraintTest();//!!!s
 	testStateObject = AddStateObjectToWorld(Vector3(0, 10, 0));//state machine code
@@ -869,6 +887,29 @@ GameObject* TutorialGame::AddJumpPad(const Vector3& position, Vector3 dimensions
 }
 GameObject* TutorialGame::AddIcePad(const Vector3& position, Vector3 dimensions, float inverseMass) {
 	GameObject* cube = new GameObject("icepad");
+
+	AABBVolume* volume = new AABBVolume(dimensions);
+
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2);
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+	
+	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
+	cube->GetPhysicsObject()->InitCubeInertia();
+	//cube->GetPhysicsObject()->SetElasticity(1);
+	cube->GetPhysicsObject()->SetFriction(0.8);
+
+	world->AddGameObject(cube);
+
+	return cube;
+}
+GameObject* TutorialGame::AddEndPad(const Vector3& position, Vector3 dimensions, float inverseMass) {
+	GameObject* cube = new GameObject("Endpad");
 
 	AABBVolume* volume = new AABBVolume(dimensions);
 
@@ -909,13 +950,14 @@ GameObject* TutorialGame::AddSpherePlayerToWorld(const Vector3& position, float 
 
 	return sphere;
 }
-void TutorialGame::BuildCubeWall(int xAxisNum,int zAxisNum, Vector3 startpos, int cubenum, Vector3 cubeDimension, float inverseMass) {
+void TutorialGame::BuildCubeWall(float xAxisNum,float zAxisNum, Vector3 startpos, int cubenum, Vector3 cubeDimension, float inverseMass) {
 	//build cube wall in maze with easy way
-
+	float dx = cubeDimension.x;
+	float dz = cubeDimension.z;
 	for (int x = 0; x < xAxisNum; ++x) {
 		for (int z = 0; z < zAxisNum; ++z) {
-			//Vector3 position = Vector3(startpos*x*cubeDimension.x, 0.0, startpos*z*cubeDimension.z);
-			//AddCubeToWorld(position, cubeDimension,inverseMass);
+			startpos = Vector3(startpos.x*x*dx, 0.0f, startpos.z*z*dz);
+			AddCubeToWorld(startpos, cubeDimension,inverseMass);
 		}
 	}
 }

@@ -10,7 +10,7 @@ namespace NCL {
 	namespace CSC8503 {
 		class Transform;
 
-		class PhysicsObject	{
+		class PhysicsObject {
 		public:
 			PhysicsObject(Transform* parentTransform, const CollisionVolume* parentVolume);
 			~PhysicsObject();
@@ -41,7 +41,7 @@ namespace NCL {
 
 			void ApplyAngularImpulse(const Vector3& force);
 			void ApplyLinearImpulse(const Vector3& force);
-			
+
 			void AddForce(const Vector3& force);
 
 			void AddForceAtPosition(const Vector3& force, const Vector3& position);
@@ -57,6 +57,13 @@ namespace NCL {
 
 			void SetAngularVelocity(const Vector3& v) {
 				angularVelocity = v;
+			}
+
+			void SetFriction(float fric) {
+				friction = fric;
+			}
+			void SetElasticity(float elast){
+				elasticity = elast;
 			}
 
 			void InitCubeInertia();
