@@ -24,6 +24,8 @@ namespace NCL {
 			}
 
 			void SetGravity(const Vector3& g);
+
+			void SetNum();
 		protected:
 			void BasicCollisionDetection();
 			void BroadPhase();

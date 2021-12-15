@@ -37,6 +37,10 @@ namespace NCL {
 			Matrix4 GetMatrix() const {
 				return matrix;
 			}
+			Vector3 GetUp() const
+			{
+				return Vector3(2 * (orientation.x * orientation.y - orientation.w * orientation.z), 1 - 2 * (orientation.x * orientation.x + orientation.z * orientation.z), 2 * (orientation.y * orientation.z + orientation.w * orientation.x));
+			}
 			void UpdateMatrix();
 		protected:
 			Matrix4		matrix;

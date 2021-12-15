@@ -99,12 +99,33 @@ namespace NCL {
 		static bool OBBSphereIntersection(const OBBVolume& volumeA, const Transform& worldTransformA,
 			const SphereVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo);
 
+		static bool AABBCapsuleIntersection(const AABBVolume& volumeA, const Transform& worldTransformA,
+			const CapsuleVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo);
+
+		static bool SphereCapsuleIntersection(const SphereVolume& volumeB, const Transform& worldTransformB,
+			const CapsuleVolume& volumeA, const Transform& worldTransformA, CollisionInfo& collisionInfo);
+
 		static Vector3 Unproject(const Vector3& screenPos, const Camera& cam);
 
 		static Vector3		UnprojectScreenPosition(Vector3 position, float aspect, float fov, const Camera &c);
 		static Matrix4		GenerateInverseProjection(float aspect, float fov, float nearPlane, float farPlane);
 		static Matrix4		GenerateInverseView(const Camera &c);
 
+		float SqDistPointSegment(const Vector3& a, const Vector3& b, const Vector3& c)
+		{
+			Vector3 ab = b - a, ac = c - a, bc = c - b;
+			float e = Vector3::Dot(ac, ab);
+			// Handle cases where c projects outside ab
+			if (e <= 0.0f)
+				return Vector3::Dot(ac, ac);
+			float f = Vector3::Dot(ab, ab);
+			if (e >= f)
+				return Vector3::Dot(bc, bc);
+			// Handle cases where c projects onto ab
+			return Vector3::Dot(ac, ac) - e * e / f;
+		}
+		static Vector3 ClosestPointOnALine(const Vector3 startOfLine, const Vector3 endOfLine, const Vector3 point);
+		static bool SphereIntersection(const float radiusA, const Vector3 posA, const float radiusB, const Vector3 posB, CollisionInfo& collisionInfo);
 	protected:
 	
 	private:

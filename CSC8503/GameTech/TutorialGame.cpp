@@ -127,11 +127,13 @@ void TutorialGame::UpdateKeys() {
 		InitGameWorld1();
 		selectionObject = nullptr;
 		lockedObject = nullptr;
+		physics->SetNum();
 	}
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::R) && Window::GetKeyboard()->KeyPressed(KeyboardKeys::NUM2)) {
 		InitGameWorld2();
 		selectionObject = nullptr;
 		lockedObject = nullptr;
+		physics->SetNum();
 	}
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F1)) {
 		InitWorld(); //We can reset the simulation at any time with F1
@@ -843,7 +845,7 @@ void TutorialGame::DrawPause() {
 }
 void TutorialGame::InitGameWorld1() {//ball
 	InitialiseAssets();//add assets first
-
+	physics->SetNum();
 	world->ClearAndErase();
 	physics->Clear();
 
@@ -852,6 +854,7 @@ void TutorialGame::InitGameWorld1() {//ball
 	//BridgeConstraintTest();//!!!s
 	
 	AddCubeToWorld(Vector3(-80, 0, 0), Vector3(3, 9, 3), 0.0f);
+	//AddCapsuleToWorld(Vector3(-80, 3, 0), 9.0f,3.0f, 0.0f);
 	AddCubeToWorld(Vector3(-74, 0, 0), Vector3(3, 6, 3), 0.0f);
 	AddCubeToWorld(Vector3(-68, 0, 0), Vector3(3, 3, 3), 0.0f);
 	AddSpherePlayerToWorld(Vector3(-76, 16, 0), 2.5, 6.0f);//add player
@@ -872,11 +875,17 @@ void TutorialGame::InitGameWorld1() {//ball
 	AddCoin(Vector3(53, 8, 0), 0.25f, 0.0f);//on bridge
 	AddCoin(Vector3(68, 8, 0), 0.25f, 0.0f);//on bridge
 	AddDeathFloor(Vector3(0, -50, 0));
+	AddCubeToWorld(Vector3(3, 0, 15), Vector3(3, 6, 3), 0.0f);
+	AddCubeToWorld(Vector3(3, 0, -15), Vector3(3, 6, 3), 0.0f);
+	AddSpin(Vector3(3, 9, 15), Vector3(14, 2, 1), Quaternion(0, 1, 0, -180), 10.0f);
+	AddSpin(Vector3(3, 9, -15), Vector3(14, 2, 1), Quaternion(0, 1, 0, 180), 10.0f);
+
 }
 void TutorialGame::InitGameWorld2() {//maze
 	InitialiseAssets();//add assets first
 	world->ClearAndErase();
 	physics->Clear();
+	physics->SetNum();
 
 	//InitGameExamples();
 	//InitDefaultFloor();
@@ -1017,6 +1026,27 @@ GameObject* TutorialGame::AddCoin(const Vector3& position, float radius, float i
 	world->AddGameObject(coin);
 
 	return coin;
+}
+GameObject* TutorialGame::AddSpin(const Vector3& position, Vector3 dimensions, Quaternion qutn, float inverseMass) {
+	GameObject* cube = new GameObject("spin");
+	AABBVolume* volume = new AABBVolume(dimensions);
+	//OBBVolume* volume = new OBBVolume(dimensions);
+
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2);
+	cube->GetTransform().SetOrientation(qutn);//set Quaternion
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	world->AddGameObject(cube);
+
+	return cube;
 }
 void TutorialGame::BuildCubeWall(float xAxisNum,float zAxisNum, Vector3 startpos, int cubenum, Vector3 cubeDimension, float inverseMass) {
 	//build cube wall in maze with easy way

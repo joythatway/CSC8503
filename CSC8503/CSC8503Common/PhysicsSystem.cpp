@@ -75,7 +75,11 @@ bool winorlose = false;//win or lose
 bool lose = false;
 int score = 0;
 
-
+void PhysicsSystem::SetNum() {
+	winorlose = false;
+	lose = false;
+	score = 0;
+}
 void PhysicsSystem::Update(float dt) {	
 	if (winorlose == true&&lose==false) {
 		Debug::Print("Win!!!", Vector2(50, 50),Vector4(1,1,1,1));
@@ -330,6 +334,11 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 		if (winorlose != true) {
 			lose = true;
 		}
+	}
+	if (a.GetName() == "spin" && b.GetName() == "sphereplayer") {
+		//make spin roatate
+		//crate spin func
+		//add toque in y axis
 	}
 
 
