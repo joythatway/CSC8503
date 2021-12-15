@@ -4,6 +4,9 @@
 #include "../CSC8503Common/StateGameObject.h"
 #include "../CSC8503Common/PushdownMachine.h"
 #include "../CSC8503Common/PushdownState.h"
+#include "..//CSC8503Common/NavigationGrid.h"
+#include "..//CSC8503Common/NavigationMap.h"
+#include "..//CSC8503Common/NavigationPath.h"
 
 
 namespace NCL {
@@ -33,6 +36,7 @@ namespace NCL {
 
 		protected:
 			//coursework begin
+			NavigationGrid* map;
 			PushdownMachine* machine;
 			std::string winnerName;
 			GameObject* player = nullptr;
@@ -41,6 +45,12 @@ namespace NCL {
 			void BuildCubeWall(float xAxisNum,float zAxisNum, Vector3 startpos, int cubenum, Vector3 cubeDimension, float inverseMass);
 			//coursework end
 			// 
+			void PathFinding();
+			void DisplayPathfinding();
+			vector <Vector3 > testNodes;//path finding
+			GameObject* AddPlayer1ToWorld(const Vector3& position);
+			GameObject* AddEnemy1ToWorld(const Vector3& position);
+
 			GameObject* AddSpherePlayerToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
 			//state machine begin
 			StateGameObject* AddStateWallToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 0.0f);
@@ -71,7 +81,8 @@ namespace NCL {
 			GameObject* AddInclinePad(const Vector3& position, Vector3 dimensions, Quaternion qutn,float inverseMass);//
 			GameObject* AddCoin(const Vector3& position, float radius, float inverseMass = 10.0f);//add coin to get score
 			GameObject* AddDeathFloor(const Vector3& position);
-			GameObject* AddSpin(const Vector3& position, Vector3 dimensions, Quaternion qutn, float inverseMass);
+			GameObject* AddSpin(const Vector3& position, Vector3 dimensions, Quaternion qutn, float inverseMass,string name);
+			void InitMap();
 	
 			bool SelectObject();
 			void MoveSelectedObject();

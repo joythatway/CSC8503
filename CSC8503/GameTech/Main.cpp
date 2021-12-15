@@ -217,6 +217,7 @@ void TestBehaviourTree() {
 }
 
 //Behaviour tree end
+/*
 vector <Vector3 > testNodes;//path finding
 void TestPathfinding() {//path finding
 	NavigationGrid grid("TestGrid1.txt");
@@ -239,6 +240,7 @@ void DisplayPathfinding() {//path finding
 		Debug::DrawLine(a, b, Vector4(0, 1, 0, 1));
 	}
 }
+*/
 
 void TestStateMachine() {
 	StateMachine* testMachine = new StateMachine();

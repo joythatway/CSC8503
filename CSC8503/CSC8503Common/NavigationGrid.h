@@ -4,18 +4,19 @@
 namespace NCL {
 	namespace CSC8503 {
 		struct GridNode {
-			GridNode* parent;
+			enum maptype
+			{
+				wall = 'x',
+				road = '.'
+			};
 
+			GridNode* parent;
 			GridNode* connected[4];
 			int		  costs[4];
-
 			Vector3		position;
-
 			float f;
 			float g;
-
 			int type;
-
 			GridNode() {
 				for (int i = 0; i < 4; ++i) {
 					connected[i] = nullptr;
@@ -36,7 +37,21 @@ namespace NCL {
 			~NavigationGrid();
 
 			bool FindPath(const Vector3& from, const Vector3& to, NavigationPath& outPath) override;
-				
+			
+			int GetWidth() {
+				return gridWidth;
+			}
+			int GetHeight() {
+				return gridHeight;
+			}
+			GridNode* GetNodes() {
+				return allNodes;
+			}
+			int GetNodesize() {
+				return nodeSize;
+			}
+
+
 		protected:
 			bool		NodeInList(GridNode* n, std::vector<GridNode*>& list) const;
 			GridNode*	RemoveBestNode(std::vector<GridNode*>& list) const;

@@ -7,6 +7,9 @@
 #include "..//CSC8503Common/PositionConstraint.h"
 
 #include "../CSC8503Common/StateGameObject.h"
+#include "..//CSC8503Common/NavigationGrid.h"
+#include "..//CSC8503Common/NavigationMap.h"
+#include "..//CSC8503Common/NavigationPath.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -115,6 +118,11 @@ void TutorialGame::UpdateGame(float dt) {
 			testStateObject1->Update(dt);
 		}
 		//state machine code end
+		
+		DisplayPathfinding();//display path on the floor by green line
+		//in the maze game, create player update(dt) func
+		//in this func, draw the path line with dt and position change
+
 		world->UpdateWorld(dt);
 		renderer->Update(dt);
 	}
@@ -875,11 +883,11 @@ void TutorialGame::InitGameWorld1() {//ball
 	AddCoin(Vector3(53, 8, 0), 0.25f, 0.0f);//on bridge
 	AddCoin(Vector3(68, 8, 0), 0.25f, 0.0f);//on bridge
 	AddDeathFloor(Vector3(0, -50, 0));
-	AddCubeToWorld(Vector3(3, 0, 15), Vector3(3, 6, 3), 0.0f);
-	AddCubeToWorld(Vector3(3, 0, -15), Vector3(3, 6, 3), 0.0f);
-	AddSpin(Vector3(3, 9, 15), Vector3(14, 2, 1), Quaternion(0, 1, 0, -180), 10.0f);
-	AddSpin(Vector3(3, 9, -15), Vector3(14, 2, 1), Quaternion(0, 1, 0, 180), 10.0f);
-
+	AddCubeToWorld(Vector3(3, 0, 15), Vector3(3, 7, 3), 0.0f);
+	AddCubeToWorld(Vector3(3, 0, -15), Vector3(3, 7, 3), 0.0f);
+	AddSpin(Vector3(3, 9, 15), Vector3(1, 2, 14.5), Quaternion(0, 1, 0, 1), 10.0f,"spinright");
+	AddSpin(Vector3(3, 9, -15), Vector3(1, 2, 14.5), Quaternion(0, 1, 0, 1), 10.0f,"spinleft");
+	//AddInclinePad(Vector3(-30, 0, -30), Vector3(20, 20, 20), Quaternion(1, 0, 0, 3), 0.0f);
 }
 void TutorialGame::InitGameWorld2() {//maze
 	InitialiseAssets();//add assets first
@@ -887,14 +895,14 @@ void TutorialGame::InitGameWorld2() {//maze
 	physics->Clear();
 	physics->SetNum();
 
-	//InitGameExamples();
-	//InitDefaultFloor();
-	AddFloorToWorld(Vector3(0, -2, 0));
-	BuildCubeWall(10, 1, Vector3(-100, 0, -100), 10, Vector3(10, 10, 10), 0.0f);
-	//InitCubeGridWorld(2,10,10,10,Vector3(5,5,5));
-	//BridgeConstraintTest();//!!!s
-	testStateObject = AddStateObjectToWorld(Vector3(0, 10, 0));//state machine code
-	testStateObject1 = AddStateObjectToWorld(Vector3(0, 20, 0));//state machine code
+	AddFloorToWorld(Vector3(0, 0, 0));
+	InitMap();
+	AddPlayerToWorld(Vector3(35, 2, 50));
+	AddEnemyToWorld(Vector3(35, 2, -50));
+	PathFinding();
+	
+	testStateObject = AddStateObjectToWorld(Vector3(-101, 10, -101));//state machine code,before delete change updategame func
+	testStateObject1 = AddStateObjectToWorld(Vector3(-101, 20, -101));//state machine code,before delete change updategame func
 }
 GameObject* TutorialGame::AddJumpPad(const Vector3& position, Vector3 dimensions, float inverseMass) {
 	GameObject* cube = new GameObject("jumppad");
@@ -927,6 +935,7 @@ GameObject* TutorialGame::AddIcePad(const Vector3& position, Vector3 dimensions,
 	cube->GetTransform()
 		.SetPosition(position)
 		.SetScale(dimensions * 2);
+	
 
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
@@ -1000,6 +1009,8 @@ GameObject* TutorialGame::AddInclinePad(const Vector3& position, Vector3 dimensi
 
 	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
 	cube->GetPhysicsObject()->InitCubeInertia();
+	cube->GetPhysicsObject()->SetFriction(10);
+
 
 	world->AddGameObject(cube);
 
@@ -1027,16 +1038,16 @@ GameObject* TutorialGame::AddCoin(const Vector3& position, float radius, float i
 
 	return coin;
 }
-GameObject* TutorialGame::AddSpin(const Vector3& position, Vector3 dimensions, Quaternion qutn, float inverseMass) {
-	GameObject* cube = new GameObject("spin");
+GameObject* TutorialGame::AddSpin(const Vector3& position, Vector3 dimensions, Quaternion qutn, float inverseMass,string name) {
+	GameObject* cube = new GameObject(name);
 	AABBVolume* volume = new AABBVolume(dimensions);
 	//OBBVolume* volume = new OBBVolume(dimensions);
 
 	cube->SetBoundingVolume((CollisionVolume*)volume);
 	cube->GetTransform()
 		.SetPosition(position)
-		.SetScale(dimensions * 2);
-	cube->GetTransform().SetOrientation(qutn);//set Quaternion
+		.SetScale(dimensions*2);
+	//cube->GetTransform().SetOrientation(qutn);//set Quaternion
 
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
@@ -1057,6 +1068,64 @@ void TutorialGame::BuildCubeWall(float xAxisNum,float zAxisNum, Vector3 startpos
 			startpos = Vector3(startpos.x*x*dx, 0.0f, startpos.z*z*dz);
 			AddCubeToWorld(startpos, cubeDimension,inverseMass);
 		}
+	}
+}
+void TutorialGame::InitMap() {
+	//map = new NavigationGrid("Map1.txt");
+	map = new NavigationGrid("TestGrid1.txt");
+
+	GridNode* nodes = map->GetNodes();
+	
+	float x, y, z;
+	Vector3 pos;
+	int nodesize = map->GetNodesize();
+	int width = map->GetWidth();
+	int height = map->GetHeight();
+	for (int z = 0; z < height; ++z) {
+		for (int x = 0; x < width; ++x) {
+			GridNode& n = nodes[(width * z) + x];
+			if (n.type == 'x') {
+				pos.x = n.position.x - 45;
+				pos.y = 7;
+				pos.z = n.position.z - 45;
+				AddCubeToWorld(pos,Vector3(0.5,0.5,0.5)*nodesize,0.0f);
+				//AddCubeToWorld(n.position, Vector3(0.5, 0.5, 0.5) * nodesize, 0.0f);
+			}
+			//if (n.type == '.') {
+			//	AddCubeToWorld(n.position, Vector3(0.5, 0.1, 0.5) * nodesize, 0.0f);
+			//}
+		}
+	}
+}
+void TutorialGame::PathFinding() {
+	//NavigationGrid grid("Map1.txt");
+	NavigationGrid grid("TestGrid1.txt");
+
+	NavigationPath outPath;
+	//Vector3 startPos(35, 2, 45);
+	//Vector3 endPos(35, 2, -45);
+	Vector3 startPos(80, 0, 10);
+	Vector3 endPos(80, 0, 80);
+
+	bool found = grid.FindPath(startPos, endPos, outPath);
+	if (found) {
+		std::cout << "path found\n";
+	}
+	else {
+		std::cout << "no path\n";
+	}
+	Vector3 pos;
+	while (outPath.PopWaypoint(pos)) {
+		testNodes.push_back(pos+Vector3(0,3,0));
+	}
+	
+}
+void TutorialGame::DisplayPathfinding() {//path finding
+	for (int i = 1; i < testNodes.size(); ++i) {
+		Vector3 a = testNodes[i - 1];
+		Vector3 b = testNodes[i];
+
+		Debug::DrawLine(a, b, Vector4(0, 1, 0, 1));//change this startpos.x and y same on endpos//
 	}
 }
 //coursework function end

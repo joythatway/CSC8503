@@ -295,6 +295,35 @@ void PhysicsSystem::Endpad(GameObject& a, GameObject& b, CollisionDetection::Con
 	//Debug::Print("Win!!!", Vector2(50,50));
 	
 }
+void PhysicsSystem::Spinpad(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p)const {
+	PhysicsObject* physA = a.GetPhysicsObject();
+	PhysicsObject* physB = b.GetPhysicsObject();
+
+	float totalMass = physA->GetInverseMass() + physB->GetInverseMass();
+	if (totalMass == 0) {
+		return;
+	}
+	//physB->ApplyLinearImpulse(Vector3(0, -1, 0) * 5);
+	//physB->ApplyLinearImpulse(Vector3(1, 0, 0) * 3);
+	//physB->ApplyLinearImpulse(Vector3(0, 1, 0) * 1);
+	//physB->ApplyAngularImpulse(Vector3(0, 0, -1) * 3);
+
+	//physB->SetInverseMass(0.0f);
+	//physB->ClearForces();
+	//physA->ClearForces();
+	//physA->SetElasticity(0);
+	//physA->~PhysicsObject();
+	//physA->SetElasticity(0);
+	//physA->ApplyAngularImpulse(Vector3(0, 1, 0) * 5);
+	if (a.GetName() == "spinright") {
+		//physA->AddTorque(Vector3(0, 1, 0) * -1500);
+		physA->SetAngularVelocity(Vector3(0, 1, 0) * -3);
+	}
+	if (a.GetName() == "spinleft") {
+		//physA->AddTorque(Vector3(0, 1, 0) * 1500);
+		physA->SetAngularVelocity(Vector3(0, 1, 0) * 3);
+	}
+}
 void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const {
 
 	if (a.GetName() == "jumppad" && b.GetName() == "sphereplayer") {
@@ -335,10 +364,11 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 			lose = true;
 		}
 	}
-	if (a.GetName() == "spin" && b.GetName() == "sphereplayer") {
-		//make spin roatate
-		//crate spin func
-		//add toque in y axis
+	if (a.GetName() == "spinleft" && b.GetName() == "sphereplayer") {
+		Spinpad(a, b, p);
+	}
+	if (a.GetName() == "spinright" && b.GetName() == "sphereplayer") {
+		Spinpad(a, b, p);
 	}
 
 
