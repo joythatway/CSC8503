@@ -28,6 +28,9 @@ namespace NCL {
 			bool IsActive() const {
 				return isActive;
 			}
+			void SetActive(bool active) {
+				isActive = active;
+			}
 
 			Transform& GetTransform() {
 				return transform;

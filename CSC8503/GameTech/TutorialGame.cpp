@@ -323,7 +323,7 @@ A single function to add a large immoveable cube to the bottom of our world
 
 */
 GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
-	GameObject* floor = new GameObject();
+	GameObject* floor = new GameObject("floor");
 
 	Vector3 floorSize	= Vector3(100, 2, 100);
 	AABBVolume* volume	= new AABBVolume(floorSize);
@@ -340,6 +340,21 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 
 	world->AddGameObject(floor);
 
+	return floor;
+}
+GameObject* TutorialGame::AddDeathFloor(const Vector3& position) {
+	GameObject* floor = new GameObject("deathfloor");
+	Vector3 floorSize = Vector3(500, 2, 500);
+	AABBVolume* volume = new AABBVolume(floorSize);
+	floor->SetBoundingVolume((CollisionVolume*)volume);
+	floor->GetTransform()
+		.SetScale(floorSize * 2)
+		.SetPosition(position);
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
+	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
+	floor->GetPhysicsObject()->SetInverseMass(0);
+	floor->GetPhysicsObject()->InitCubeInertia();
+	world->AddGameObject(floor);
 	return floor;
 }
 //add wall to world
@@ -848,7 +863,15 @@ void TutorialGame::InitGameWorld1() {//ball
 	AddIcePad(Vector3(3, 0, 0), Vector3(15, 6, 3), 0.0f);
 	Bridge(Vector3(23,5,0));
 	AddEndPad(Vector3(100, 10, 0), Vector3(3, 20, 20), 0.0f);
-	
+	AddInclinePad(Vector3(-56, 0, -6), Vector3(9, 1, 3), Quaternion(1, 0, 0, 3), 0.0f);
+	AddCoin(Vector3(-44, 16, 0), 0.25f, 0.0f);
+	AddCoin(Vector3(-20, 16, 0), 0.25f, 0.0f);
+	AddCoin(Vector3(3, 8, 0), 0.25f, 0.0f);
+	AddCoin(Vector3(23, 8, 0), 0.25f, 0.0f);//on bridge
+	AddCoin(Vector3(38, 8, 0), 0.25f, 0.0f);//on bridge
+	AddCoin(Vector3(53, 8, 0), 0.25f, 0.0f);//on bridge
+	AddCoin(Vector3(68, 8, 0), 0.25f, 0.0f);//on bridge
+	AddDeathFloor(Vector3(0, -50, 0));
 }
 void TutorialGame::InitGameWorld2() {//maze
 	InitialiseAssets();//add assets first
@@ -949,6 +972,51 @@ GameObject* TutorialGame::AddSpherePlayerToWorld(const Vector3& position, float 
 	world->AddGameObject(sphere);
 
 	return sphere;
+}
+GameObject* TutorialGame::AddInclinePad(const Vector3& position, Vector3 dimensions, Quaternion qutn, float inverseMass) {
+	GameObject* cube = new GameObject("Inclinepad");
+
+	//AABBVolume* volume = new AABBVolume(dimensions);
+	OBBVolume* volume = new OBBVolume(dimensions);
+
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2);
+	cube->GetTransform().SetOrientation(qutn);//set Quaternion
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	world->AddGameObject(cube);
+
+	return cube;
+}
+GameObject* TutorialGame::AddCoin(const Vector3& position, float radius, float inverseMass) {
+	GameObject* coin = new GameObject("coin");
+
+	SphereVolume* volume = new SphereVolume(radius);
+	coin->SetBoundingVolume((CollisionVolume*)volume);
+	coin->GetTransform()
+		.SetScale(Vector3(0.25, 0.25, 0.25))
+		.SetPosition(position);
+
+	coin->SetRenderObject(new RenderObject(&coin->GetTransform(), bonusMesh, nullptr, basicShader));
+	coin->SetPhysicsObject(new PhysicsObject(&coin->GetTransform(), coin->GetBoundingVolume()));
+
+	coin->GetPhysicsObject()->SetInverseMass(inverseMass);
+	coin->GetPhysicsObject()->InitSphereInertia();
+	coin->GetPhysicsObject()->SetElasticity(0);
+	coin->GetPhysicsObject()->SetFriction(0);
+
+
+	world->AddGameObject(coin);
+
+	return coin;
 }
 void TutorialGame::BuildCubeWall(float xAxisNum,float zAxisNum, Vector3 startpos, int cubenum, Vector3 cubeDimension, float inverseMass) {
 	//build cube wall in maze with easy way

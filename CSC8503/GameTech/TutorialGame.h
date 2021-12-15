@@ -8,11 +8,11 @@
 
 namespace NCL {
 	namespace CSC8503 {
+		
 		class TutorialGame		{
 		public:
 			TutorialGame();
 			~TutorialGame();
-
 			virtual void UpdateGame(float dt);
 			//coursework function begin
 			bool isSelected = false;
@@ -68,6 +68,9 @@ namespace NCL {
 			GameObject* AddJumpPad(const Vector3& position, Vector3 dimensions, float inverseMass);//jump
 			GameObject* AddIcePad(const Vector3& position, Vector3 dimensions, float inverseMass);//speed up
 			GameObject* AddEndPad(const Vector3& position, Vector3 dimensions, float inverseMass);//End condition
+			GameObject* AddInclinePad(const Vector3& position, Vector3 dimensions, Quaternion qutn,float inverseMass);//End condition
+			GameObject* AddCoin(const Vector3& position, float radius, float inverseMass = 10.0f);//add coin to get score
+			GameObject* AddDeathFloor(const Vector3& position);
 	
 			bool SelectObject();
 			void MoveSelectedObject();

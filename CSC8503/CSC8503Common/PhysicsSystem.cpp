@@ -15,7 +15,6 @@
 using namespace NCL;
 using namespace CSC8503;
 class TutorialGame;
-
 /*
 
 These two variables help define the relationship between positions
@@ -71,12 +70,26 @@ being at a low rate.
 */
 int realHZ		= idealHZ;
 float realDT	= idealDT;
-bool winorlose = false;
+
+bool winorlose = false;//win or lose
+bool lose = false;
+int score = 0;
+
 
 void PhysicsSystem::Update(float dt) {	
-	if (winorlose == true) {
+	if (winorlose == true&&lose==false) {
 		Debug::Print("Win!!!", Vector2(50, 50),Vector4(1,1,1,1));
+		Debug::Print("Your score", Vector2(50, 55), Vector4(1, 1, 1, 1));
+		Debug::Print(std::to_string(score), Vector2(50, 60), Vector4(1, 1, 1, 1));
+		Debug::Print("press M back to Menu", Vector2(50, 65), Vector4(1, 1, 1, 1));
 	}
+	if (lose==true&&winorlose==false) {
+		Debug::Print("Lose!!!", Vector2(50, 50), Vector4(1, 1, 1, 1));
+		Debug::Print("Your score", Vector2(50, 55), Vector4(1, 1, 1, 1));
+		Debug::Print(std::to_string(score), Vector2(50, 60), Vector4(1, 1, 1, 1));
+		Debug::Print("press M back to Menu", Vector2(50, 65), Vector4(1, 1, 1, 1));
+	}
+
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::B)) {
 		useBroadPhase = !useBroadPhase;
 		std::cout << "Setting broadphase to " << useBroadPhase << std::endl;
@@ -271,8 +284,10 @@ void PhysicsSystem::Endpad(GameObject& a, GameObject& b, CollisionDetection::Con
 	//physB->ClearForces();
 	//physA->ClearForces();
 	//physA->SetElasticity(0);
-	//OGLRenderer::DrawString("heleo", Vector2(20, 20));
-	winorlose = true;
+	//physA->~PhysicsObject();
+	if (lose != true) {
+		winorlose = true;
+	}
 	//Debug::Print("Win!!!", Vector2(50,50));
 	
 }
@@ -291,6 +306,30 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 	if (a.GetName() == "Endpad" && b.GetName() == "sphereplayer") {
 		// end condition
 		Endpad(a,b,p);
+	}
+	if (a.GetName() == "floor" && b.GetName() == "sphereplayer") {
+		//print lose
+		if (winorlose != true) {
+			lose = true;
+		}
+	}
+	if (a.GetName() == "coin" && b.GetName() == "sphereplayer") {
+		//get score
+		score += 10;
+		a.SetActive(false);
+		a.SetBoundingVolume(nullptr);
+	}
+	if (a.GetName() == "sphereplayer" && b.GetName() == "coin") {
+		//get score
+		score += 10;
+		b.SetActive(false);
+		b.SetBoundingVolume(nullptr);
+		return;
+	}
+	if (a.GetName() == "deathfloor" && b.GetName() == "sphereplayer") {
+		if (winorlose != true) {
+			lose = true;
+		}
 	}
 
 
