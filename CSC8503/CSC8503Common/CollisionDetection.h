@@ -58,9 +58,9 @@ namespace NCL {
 			}
 		};
 
-		static bool SphereCapsuleIntersection(
-			const CapsuleVolume& volumeA, const Transform& worldTransformA,
-			const SphereVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo);
+		//static bool SphereCapsuleIntersection(
+		//	const CapsuleVolume& volumeA, const Transform& worldTransformA,
+		//	const SphereVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo);
 
 		//TODO ADD THIS PROPERLY
 		static bool RayBoxIntersection(const Ray&r, const Vector3& boxPos, const Vector3& boxSize, RayCollision& collision);
@@ -102,8 +102,8 @@ namespace NCL {
 		static bool AABBCapsuleIntersection(const AABBVolume& volumeA, const Transform& worldTransformA,
 			const CapsuleVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo);
 
-		static bool SphereCapsuleIntersection(const SphereVolume& volumeB, const Transform& worldTransformB,
-			const CapsuleVolume& volumeA, const Transform& worldTransformA, CollisionInfo& collisionInfo);
+		static bool SphereCapsuleIntersection(const CapsuleVolume& volumeA, const Transform& worldTransformA,
+			const SphereVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo);
 
 		static Vector3 Unproject(const Vector3& screenPos, const Camera& cam);
 

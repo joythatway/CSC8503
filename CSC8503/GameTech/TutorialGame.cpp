@@ -118,10 +118,12 @@ void TutorialGame::UpdateGame(float dt) {
 			testStateObject1->Update(dt);
 		}
 		//state machine code end
-		
-		DisplayPathfinding();//display path on the floor by green line
+		if (pathfound) {
+			DisplayPathfinding();//display path on the floor by green line
 		//in the maze game, create player update(dt) func
 		//in this func, draw the path line with dt and position change
+		}
+	
 
 		world->UpdateWorld(dt);
 		renderer->Update(dt);
@@ -856,13 +858,14 @@ void TutorialGame::InitGameWorld1() {//ball
 	physics->SetNum();
 	world->ClearAndErase();
 	physics->Clear();
+	pathfound = false;
 
 	//InitGameExamples();
 	InitDefaultFloor();
 	//BridgeConstraintTest();//!!!s
 	
 	AddCubeToWorld(Vector3(-80, 0, 0), Vector3(3, 9, 3), 0.0f);
-	//AddCapsuleToWorld(Vector3(-80, 3, 0), 9.0f,3.0f, 0.0f);
+	//AddCapsuleToWorld(Vector3(-85, 3, 0), 9.0f,5.0f, 6.0f);
 	AddCubeToWorld(Vector3(-74, 0, 0), Vector3(3, 6, 3), 0.0f);
 	AddCubeToWorld(Vector3(-68, 0, 0), Vector3(3, 3, 3), 0.0f);
 	AddSpherePlayerToWorld(Vector3(-76, 16, 0), 2.5, 6.0f);//add player
@@ -888,12 +891,15 @@ void TutorialGame::InitGameWorld1() {//ball
 	AddSpin(Vector3(3, 9, 15), Vector3(1, 2, 14.5), Quaternion(0, 1, 0, 1), 10.0f,"spinright");
 	AddSpin(Vector3(3, 9, -15), Vector3(1, 2, 14.5), Quaternion(0, 1, 0, 1), 10.0f,"spinleft");
 	//AddInclinePad(Vector3(-30, 0, -30), Vector3(20, 20, 20), Quaternion(1, 0, 0, 3), 0.0f);
+	AddCapsuleToWorld(Vector3(60, 20, 60), 6.0f, 5.0f, 5.0f);
+	AddCapsuleToWorld(Vector3(70, 30, 70), 9.0f, 5.0f, 5.0f);
 }
 void TutorialGame::InitGameWorld2() {//maze
 	InitialiseAssets();//add assets first
 	world->ClearAndErase();
 	physics->Clear();
 	physics->SetNum();
+	pathfound = false;
 
 	AddFloorToWorld(Vector3(0, 0, 0));
 	InitMap();
@@ -1071,8 +1077,9 @@ void TutorialGame::BuildCubeWall(float xAxisNum,float zAxisNum, Vector3 startpos
 	}
 }
 void TutorialGame::InitMap() {
-	//map = new NavigationGrid("Map1.txt");
-	map = new NavigationGrid("TestGrid1.txt");
+	map = new NavigationGrid("Map1.txt");
+	pathfound = false;
+	//map = new NavigationGrid("TestGrid1.txt");
 
 	GridNode* nodes = map->GetNodes();
 	
@@ -1098,21 +1105,26 @@ void TutorialGame::InitMap() {
 	}
 }
 void TutorialGame::PathFinding() {
-	//NavigationGrid grid("Map1.txt");
-	NavigationGrid grid("TestGrid1.txt");
+	NavigationGrid grid("Map1.txt");
+	//NavigationGrid grid("TestGrid1.txt");
 
 	NavigationPath outPath;
 	//Vector3 startPos(35, 2, 45);
 	//Vector3 endPos(35, 2, -45);
-	Vector3 startPos(80, 0, 10);
-	Vector3 endPos(80, 0, 80);
+	//Vector3 startPos(80, 0, 10);//tu
+	//Vector3 endPos(80, 0, 80);//tu
+	Vector3 startPos(80, 0, 0);
+	Vector3 endPos(80, 0, 90);
 
+	//bool found = grid.FindPath(playerpos, enemypos, outPath);//use player pos and enemy pos to update path
 	bool found = grid.FindPath(startPos, endPos, outPath);
 	if (found) {
 		std::cout << "path found\n";
+		pathfound = true;
 	}
 	else {
 		std::cout << "no path\n";
+		pathfound = false;
 	}
 	Vector3 pos;
 	while (outPath.PopWaypoint(pos)) {
@@ -1125,7 +1137,8 @@ void TutorialGame::DisplayPathfinding() {//path finding
 		Vector3 a = testNodes[i - 1];
 		Vector3 b = testNodes[i];
 
-		Debug::DrawLine(a, b, Vector4(0, 1, 0, 1));//change this startpos.x and y same on endpos//
+		//Debug::DrawLine(a, b, Vector4(0, 1, 0, 1));//change this startpos.x and y same on endpos//
+		Debug::DrawLine(Vector3(a.x-45.0f,a.y,a.z-45.0f), Vector3(b.x-45.0f,b.y,b.z-45.0f), Vector4(0, 1, 0, 1));//change this startpos.x and y same on endpos//
 	}
 }
 //coursework function end

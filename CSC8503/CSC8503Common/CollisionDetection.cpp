@@ -365,13 +365,13 @@ bool CollisionDetection::ObjectIntersection(GameObject* a, GameObject* b, Collis
 		return AABBCapsuleIntersection((AABBVolume&)*volA, transformA, (CapsuleVolume&)*volB, transformB, collisionInfo);
 	}
 
-	if (volA->type == VolumeType::AABB && volB->type == VolumeType::Capsule) {
-		return SphereCapsuleIntersection((SphereVolume&)*volA, transformA, (CapsuleVolume&)*volB, transformB, collisionInfo);
+	if (volA->type == VolumeType::Capsule && volB->type == VolumeType::Sphere) {
+		return SphereCapsuleIntersection((CapsuleVolume&)*volA, transformA, (SphereVolume&)*volB, transformB, collisionInfo);
 	}
-	if (volA->type == VolumeType::Capsule && volB->type == VolumeType::AABB) {
+	if (volA->type == VolumeType::Sphere && volB->type == VolumeType::Capsule) {
 		collisionInfo.a = b;
 		collisionInfo.b = a;
-		return SphereCapsuleIntersection((SphereVolume&)*volA, transformA, (CapsuleVolume&)*volB, transformB, collisionInfo);
+		return SphereCapsuleIntersection((CapsuleVolume&)*volA, transformA, (SphereVolume&)*volB, transformB, collisionInfo);
 	}
 
 	return false;
@@ -502,13 +502,13 @@ bool CollisionDetection::OBBIntersection(
 	const OBBVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo) {
 	return false;
 }
-
+/*
 bool CollisionDetection::SphereCapsuleIntersection(
 	const CapsuleVolume& volumeA, const Transform& worldTransformA,
 	const SphereVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo) {
 	return false;
 }
-
+*/
 bool CollisionDetection::AABBCapsuleIntersection(//AABB-Capsule
 	const AABBVolume& volumeA, const Transform& worldTransformA,
 	const CapsuleVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo) {
@@ -536,6 +536,53 @@ bool CollisionDetection::AABBCapsuleIntersection(//AABB-Capsule
 	//sphereTransform.SetPosition(bottomSpherePos);
 	//return MovingSphereAABBIntersection(volumeA, worldTransformA, SphereVolume(volumeB.GetRadius()), sphereTransform, upVector * (capsuleHalfHeight - capsuleRadius) * 2, collisionInfo);
 	*/
+	Vector3 boxSize = volumeA.GetHalfDimensions();
+	Vector3 AABBPos = worldTransformA.GetPosition();
+	Vector3 capsulePos = worldTransformB.GetPosition();
+	Vector3 upVector = worldTransformB.GetOrientation() * Vector3(0, 1, 0);
+	SphereVolume tempSphere = SphereVolume(volumeB.GetRadius());
+	///Northern
+	Vector3 topPos = capsulePos + upVector * (volumeB.GetHalfHeight() - volumeB.GetRadius());
+	Vector3 vA = topPos - AABBPos;
+	Vector3 vB = topPos - capsulePos;
+
+	if (Vector3::Dot(vA, vB) < 0)
+	{
+		Transform tempTransform = Transform(worldTransformB);
+		tempTransform.SetPosition(topPos);
+
+		bool coll = AABBSphereIntersection(volumeA, worldTransformA, tempSphere, tempTransform, collisionInfo);
+		collisionInfo.point.localA = Vector3();
+		collisionInfo.point.localB = Vector3();
+		return coll;
+	}
+	/// Southern
+	Vector3 botPos = capsulePos - upVector * (volumeB.GetHalfHeight() - volumeB.GetRadius());
+	vA = botPos - AABBPos;
+	vB = botPos - capsulePos;
+	if (Vector3::Dot(vA, vB) < 0)
+	{
+		Transform tempTransform = Transform(worldTransformB);
+		tempTransform.SetPosition(botPos);
+
+		bool coll = AABBSphereIntersection(volumeA, worldTransformA, tempSphere, tempTransform, collisionInfo);
+		collisionInfo.point.localA = Vector3();
+		collisionInfo.point.localB = Vector3();
+		return coll;
+
+	}
+	Vector3 d = capsulePos + upVector * (Vector3::Dot((AABBPos - capsulePos), upVector));
+
+	Vector3 rad = Vector3(volumeB.GetRadius(), volumeB.GetRadius(), volumeB.GetRadius());
+	Maths::Clamp(d, d - rad, d + rad);
+
+	Transform tempTransform = Transform(worldTransformB);
+	tempTransform.SetPosition(d);
+
+	bool coll = AABBSphereIntersection(volumeA, worldTransformA, tempSphere, tempTransform, collisionInfo);
+	collisionInfo.point.localA = Vector3();
+	collisionInfo.point.localB = Vector3();
+	return coll;
 	return false;
 }
 bool CollisionDetection::SphereIntersection(const float radiusA, const Vector3 posA, const float radiusB, const Vector3 posB, CollisionInfo& collisionInfo)
@@ -560,16 +607,72 @@ bool CollisionDetection::SphereIntersection(const float radiusA, const Vector3 p
 }
 
 bool CollisionDetection::SphereCapsuleIntersection(//Sphere-Capsule
-	const SphereVolume& volumeB, const Transform& worldTransformB,
-	const CapsuleVolume& volumeA, const Transform& worldTransformA, CollisionInfo& collisionInfo) {
-	/*
-	Vector3 capsPos = worldTransformA.GetPosition();
+	const CapsuleVolume& volumeA, const Transform& worldTransformA,
+	const SphereVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo) {
+	
+	Vector3 capsulePos = worldTransformA.GetPosition();
 	Vector3 spherePos = worldTransformB.GetPosition();
-	Vector3 capsCentreLineTop = capsPos + worldTransformA.GetUp() * volumeA.GetHalfHeight();
-	Vector3 capsCentreLineBottom = capsPos - worldTransformA.GetUp() * volumeA.GetHalfHeight();
-	Vector3 closestPoint = ClosestPointOnALine(capsCentreLineBottom, capsCentreLineTop, spherePos);
-	return SphereIntersection(volumeA.GetRadius(), capsPos, volumeB.GetRadius(), spherePos, collisionInfo);
-	*/
+	Vector3 upVector = worldTransformA.GetOrientation() * Vector3(0, 1, 0);
+	// Northern 
+	Vector3 topPos = capsulePos + upVector * (volumeA.GetHalfHeight() - volumeA.GetRadius());
+	Vector3 vA = topPos - spherePos;
+	Vector3 vB = topPos - capsulePos;
+	float isPointInhemisphere = Vector3::Dot(vA, vB);
+	if (isPointInhemisphere < 0)
+	{
+		Transform tempTransform = Transform(worldTransformA);
+		tempTransform.SetPosition(topPos);
+
+		// point in northen hemisphere
+		SphereVolume tempSphere = SphereVolume(volumeA.GetRadius());
+
+		bool cool = SphereIntersection(tempSphere, tempTransform, volumeB, worldTransformB, collisionInfo);
+		collisionInfo.point.localA = Vector3();
+
+		if (cool)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	// Soutern 
+	Vector3 botPos = capsulePos - upVector * (volumeA.GetHalfHeight() - volumeA.GetRadius());
+	vA = botPos - spherePos;
+	vB = botPos - capsulePos;
+	isPointInhemisphere = Vector3::Dot(vA, vB);
+	if (isPointInhemisphere < 0)
+	{
+		// point in southern hemisphere
+		SphereVolume tempSphere = SphereVolume(volumeA.GetRadius());
+		Transform tempTransform = Transform(worldTransformA);
+		bool coll = SphereIntersection(tempSphere, tempTransform, volumeB, worldTransformB, collisionInfo);
+		collisionInfo.point.localA = Vector3();
+		if (coll)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	float radii = volumeA.GetRadius() + volumeB.GetRadius();
+	Vector3 d = capsulePos + upVector * (Vector3::Dot((capsulePos - spherePos), upVector));
+	Vector3 delta = spherePos - d;
+	float deltaLength = Vector3::Distance(d, spherePos);
+	if (deltaLength < radii)
+	{
+		float penetration = (radii - deltaLength);
+		Vector3 normal = delta.Normalised();
+		Vector3 localA = normal * volumeA.GetRadius();
+		Vector3 localB = -normal * volumeB.GetRadius();
+		collisionInfo.AddContactPoint(localA, localB, normal, penetration);
+		collisionInfo.point.localA = Vector3();
+		return true;// we 're colliding !
+	}
 	return false;
 }
 Vector3 CollisionDetection::ClosestPointOnALine(const Vector3 startOfLine, const Vector3 endOfLine, const Vector3 point)

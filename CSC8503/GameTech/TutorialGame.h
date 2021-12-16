@@ -45,6 +45,9 @@ namespace NCL {
 			void BuildCubeWall(float xAxisNum,float zAxisNum, Vector3 startpos, int cubenum, Vector3 cubeDimension, float inverseMass);
 			//coursework end
 			// 
+			bool pathfound = false;
+			Vector3 playerpos;
+			Vector3 enemypos;
 			void PathFinding();
 			void DisplayPathfinding();
 			vector <Vector3 > testNodes;//path finding
