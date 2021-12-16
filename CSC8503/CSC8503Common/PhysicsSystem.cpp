@@ -327,11 +327,13 @@ void PhysicsSystem::Spinpad(GameObject& a, GameObject& b, CollisionDetection::Co
 void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const {
 
 	if (a.GetName() == "jumppad" && b.GetName() == "sphereplayer") {
+		//Debug::Print("Press 'Z' to active jumppad work", Vector2(10, 100), Vector4(1, 1, 1, 1));
 		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::Z)) {
 			jumppad(a, b, p);
 		}
 	}
 	if (a.GetName() == "icepad" && b.GetName() == "sphereplayer") {
+		//Debug::Print("Press 'Z' to active icepad work", Vector2(10, 100), Vector4(1, 1, 1, 1));
 		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::Z)) {
 			icepad(a, b, p);
 		}
@@ -413,6 +415,14 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 	physA->ApplyAngularImpulse(Vector3::Cross(relativeA, -fullImpulse));
 	physB->ApplyAngularImpulse(Vector3::Cross(relativeB, fullImpulse));
 
+	//friction
+	/*
+	float cFriction = physA->GetFriction() * physB->GetFriction();
+	float jT = -(cFriction * Vector3::Dot(contactVelocity, tangent)) / (totalMass + angularEffect);
+	fullImpulse = tangent * jT;
+	physA->ApplyLinearImpulse(-fullImpulse);
+	physB->ApplyLinearImpulse(fullImpulse);
+	*/
 }
 
 /*

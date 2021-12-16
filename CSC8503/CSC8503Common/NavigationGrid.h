@@ -50,6 +50,10 @@ namespace NCL {
 			int GetNodesize() {
 				return nodeSize;
 			}
+			//void makegrid(const std::string& filename) {
+			//	std::string fname = filename;
+			//	NavigationGrid(fname);
+			//}
 
 
 		protected:

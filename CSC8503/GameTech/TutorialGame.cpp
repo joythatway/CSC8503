@@ -19,6 +19,7 @@ TutorialGame::TutorialGame()	{
 	world		= new GameWorld();
 	renderer	= new GameTechRenderer(*world);
 	physics		= new PhysicsSystem(*world);
+	//NavigationGrid* grid=new NavigationGrid("Map1.txt");
 
 	forceMagnitude	= 10.0f;
 	//useGravity		= false;
@@ -120,10 +121,14 @@ void TutorialGame::UpdateGame(float dt) {
 		//state machine code end
 		if (pathfound) {
 			DisplayPathfinding();//display path on the floor by green line
+			//updateplayer(dt);
 		//in the maze game, create player update(dt) func
 		//in this func, draw the path line with dt and position change
 		}
-	
+		drawplayerenemy();
+		if (game1flag) {
+			Debug::Print("Press 'Z' to active jumppad and icepad work", Vector2(5, 95), Vector4(1, 1, 1, 1));
+		}
 
 		world->UpdateWorld(dt);
 		renderer->Update(dt);
@@ -540,56 +545,41 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position) {
 	float meshSize = 3.0f;
 	float inverseMass = 0.5f;
 
-	GameObject* character = new GameObject();
-
+	//GameObject* character = new GameObject();
+	ballplayer = new GameObject("ballplayer");
 	AABBVolume* volume = new AABBVolume(Vector3(0.3f, 0.85f, 0.3f) * meshSize);
-
-	character->SetBoundingVolume((CollisionVolume*)volume);
-
-	character->GetTransform()
+	ballplayer->SetBoundingVolume((CollisionVolume*)volume);
+	ballplayer->GetTransform()
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(position);
 
-	if (rand() % 2) {
-		character->SetRenderObject(new RenderObject(&character->GetTransform(), charMeshA, nullptr, basicShader));
-	}
-	else {
-		character->SetRenderObject(new RenderObject(&character->GetTransform(), charMeshB, nullptr, basicShader));
-	}
-	character->SetPhysicsObject(new PhysicsObject(&character->GetTransform(), character->GetBoundingVolume()));
+	ballplayer->SetRenderObject(new RenderObject(&ballplayer->GetTransform(), charMeshA, nullptr, basicShader));
 
-	character->GetPhysicsObject()->SetInverseMass(inverseMass);
-	character->GetPhysicsObject()->InitSphereInertia();
+	ballplayer->SetPhysicsObject(new PhysicsObject(&ballplayer->GetTransform(), ballplayer->GetBoundingVolume()));
+	ballplayer->GetPhysicsObject()->SetInverseMass(inverseMass);
+	ballplayer->GetPhysicsObject()->InitSphereInertia();
 
-	world->AddGameObject(character);
-
+	world->AddGameObject(ballplayer);
 	//lockedObject = character;
-
-	return character;
+	return ballplayer;
 }
 
 GameObject* TutorialGame::AddEnemyToWorld(const Vector3& position) {
 	float meshSize		= 3.0f;
 	float inverseMass	= 0.5f;
-
-	GameObject* character = new GameObject();
-
+	//GameObject* character = new GameObject();
+	enemyball = new GameObject("enemyball");
 	AABBVolume* volume = new AABBVolume(Vector3(0.3f, 0.9f, 0.3f) * meshSize);
-	character->SetBoundingVolume((CollisionVolume*)volume);
-
-	character->GetTransform()
+	enemyball->SetBoundingVolume((CollisionVolume*)volume);
+	enemyball->GetTransform()
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(position);
-
-	character->SetRenderObject(new RenderObject(&character->GetTransform(), enemyMesh, nullptr, basicShader));
-	character->SetPhysicsObject(new PhysicsObject(&character->GetTransform(), character->GetBoundingVolume()));
-
-	character->GetPhysicsObject()->SetInverseMass(inverseMass);
-	character->GetPhysicsObject()->InitSphereInertia();
-
-	world->AddGameObject(character);
-
-	return character;
+	enemyball->SetRenderObject(new RenderObject(&enemyball->GetTransform(), enemyMesh, nullptr, basicShader));
+	enemyball->SetPhysicsObject(new PhysicsObject(&enemyball->GetTransform(), enemyball->GetBoundingVolume()));
+	enemyball->GetPhysicsObject()->SetInverseMass(inverseMass);
+	enemyball->GetPhysicsObject()->InitSphereInertia();
+	world->AddGameObject(enemyball);
+	return enemyball;
 }
 
 GameObject* TutorialGame::AddBonusToWorld(const Vector3& position) {
@@ -651,7 +641,31 @@ StateGameObject* TutorialGame::AddStateWallToWorld(const Vector3& position, Vect
 
 	return apple;
 }
+StateGameObject* TutorialGame::AddStateCapToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass) {
+	StateGameObject* capsule = new StateGameObject();
 
+	//CapsuleVolume* volume = new CapsuleVolume(halfHeight, radius);
+	SphereVolume* volume = new SphereVolume(0.25f);
+	capsule->SetBoundingVolume((CollisionVolume*)volume);
+
+	//capsule->GetTransform()
+		//.SetScale(Vector3(radius * 2, halfHeight, radius * 2))
+		//.SetPosition(position);
+
+	capsule->GetTransform()
+		.SetScale(Vector3(radius * 2, halfHeight, radius * 2))
+		.SetPosition(position);
+
+	capsule->SetRenderObject(new RenderObject(&capsule->GetTransform(), capsuleMesh, basicTex, basicShader));
+	capsule->SetPhysicsObject(new PhysicsObject(&capsule->GetTransform(), capsule->GetBoundingVolume()));
+
+	capsule->GetPhysicsObject()->SetInverseMass(inverseMass);
+	capsule->GetPhysicsObject()->InitCubeInertia();
+
+	world->AddGameObject(capsule);
+
+	return capsule;
+}
 /*
 
 Every frame, this code will let you perform a raycast, to see if there's an object
@@ -859,7 +873,7 @@ void TutorialGame::InitGameWorld1() {//ball
 	world->ClearAndErase();
 	physics->Clear();
 	pathfound = false;
-
+	game1flag = true;
 	//InitGameExamples();
 	InitDefaultFloor();
 	//BridgeConstraintTest();//!!!s
@@ -874,6 +888,7 @@ void TutorialGame::InitGameWorld1() {//ball
 	testStateObject = AddStateWallToWorld(Vector3(-44,0,-8), Vector3(3,3,3), 10.0f);//state machine code
 	AddJumpPad(Vector3(-32, 0, 0), Vector3(9, 1, 3), 0.0f);//jump pad
 	testStateObject1 = AddStateWallToWorld(Vector3(-20, 0, -8), Vector3(3, 3, 3), 10.0f);//state machine code
+	//testStateObject1 = AddStateCapToWorld(Vector3(-20, 0, -8), 3.0f, 2.5f, 5.0f);
 	AddIcePad(Vector3(3, 0, 0), Vector3(15, 6, 3), 0.0f);
 	Bridge(Vector3(23,5,0));
 	AddEndPad(Vector3(100, 10, 0), Vector3(3, 20, 20), 0.0f);
@@ -893,6 +908,7 @@ void TutorialGame::InitGameWorld1() {//ball
 	//AddInclinePad(Vector3(-30, 0, -30), Vector3(20, 20, 20), Quaternion(1, 0, 0, 3), 0.0f);
 	AddCapsuleToWorld(Vector3(60, 20, 60), 6.0f, 5.0f, 5.0f);
 	AddCapsuleToWorld(Vector3(70, 30, 70), 9.0f, 5.0f, 5.0f);
+	AddSphereToWorld(Vector3(70, 40, 70), 5.0f, 5.0f);
 }
 void TutorialGame::InitGameWorld2() {//maze
 	InitialiseAssets();//add assets first
@@ -900,11 +916,15 @@ void TutorialGame::InitGameWorld2() {//maze
 	physics->Clear();
 	physics->SetNum();
 	pathfound = false;
+	game1flag = false;
+	//NavigationGrid grid("Map1.txt");
+	
+	
 
 	AddFloorToWorld(Vector3(0, 0, 0));
 	InitMap();
-	AddPlayerToWorld(Vector3(35, 2, 50));
-	AddEnemyToWorld(Vector3(35, 2, -50));
+	AddPlayerToWorld(Vector3(80, 2, 90));
+	AddEnemyToWorld(Vector3(80, 2, 0));
 	PathFinding();
 	
 	testStateObject = AddStateObjectToWorld(Vector3(-101, 10, -101));//state machine code,before delete change updategame func
@@ -1095,17 +1115,27 @@ void TutorialGame::InitMap() {
 				pos.x = n.position.x - 45;
 				pos.y = 7;
 				pos.z = n.position.z - 45;
-				AddCubeToWorld(pos,Vector3(0.5,0.5,0.5)*nodesize,0.0f);
-				//AddCubeToWorld(n.position, Vector3(0.5, 0.5, 0.5) * nodesize, 0.0f);
+				//AddCubeToWorld(pos,Vector3(0.5,0.5,0.5)*nodesize,0.0f);//make maze to center of floor
+				AddCubeToWorld(n.position, Vector3(0.5, 0.5, 0.5) * nodesize, 0.0f);// original maze position
 			}
 			//if (n.type == '.') {
 			//	AddCubeToWorld(n.position, Vector3(0.5, 0.1, 0.5) * nodesize, 0.0f);
 			//}
 		}
 	}
+	//grid->makegrid("Map1.txt");
+}
+void TutorialGame::Getenemypos() {
+	Vector3 startPos = enemyball->GetTransform().GetPosition();
+	int x = (int)startPos.x;
+	int z = (int)startPos.z;
+	float fx = (float)x;
+	float fz = (float)z;
+	startPos = Vector3(fx, 0.0f, fz);
 }
 void TutorialGame::PathFinding() {
 	NavigationGrid grid("Map1.txt");
+	//NavigationGrid grid("Map1.txt");
 	//NavigationGrid grid("TestGrid1.txt");
 
 	NavigationPath outPath;
@@ -1113,8 +1143,28 @@ void TutorialGame::PathFinding() {
 	//Vector3 endPos(35, 2, -45);
 	//Vector3 startPos(80, 0, 10);//tu
 	//Vector3 endPos(80, 0, 80);//tu
-	Vector3 startPos(80, 0, 0);
-	Vector3 endPos(80, 0, 90);
+	//Vector3 startPos(80, 0, 0);
+	//Vector3 shift = Vector3(45, 0, -45);
+	
+	//now use this code 
+	Vector3 startPos = enemyball->GetTransform().GetPosition();
+	int sx = (int)startPos.x;
+	int sz = (int)startPos.z;
+	float sfx = (float)sx;
+	float sfz = (float)sz;
+	startPos = Vector3(sfx, 0.0f, sfz);
+	//startPos = Vector3(startPos.x, 0.0f, startPos.z);
+	//now use this code 
+	
+	
+	//startPos -= shift;
+	//Vector3 endPos(80, 0, 90);
+	Vector3 endPos = ballplayer->GetTransform().GetPosition();
+	int ex = (int)endPos.x;
+	int ez = (int)endPos.z;
+	float efx = (float)ex;
+	float efz = (float)ez;
+	endPos = Vector3(efx, 0.0f, efz);
 
 	//bool found = grid.FindPath(playerpos, enemypos, outPath);//use player pos and enemy pos to update path
 	bool found = grid.FindPath(startPos, endPos, outPath);
@@ -1130,15 +1180,64 @@ void TutorialGame::PathFinding() {
 	while (outPath.PopWaypoint(pos)) {
 		testNodes.push_back(pos+Vector3(0,3,0));
 	}
-	
+	//i = testNodes.begin();
 }
 void TutorialGame::DisplayPathfinding() {//path finding
 	for (int i = 1; i < testNodes.size(); ++i) {
+		Vector3 nowPos = enemyball->GetTransform().GetPosition();
+		int sx = (int)nowPos.x;
+		int sz = (int)nowPos.z;
+		float sfx = (float)sx;
+		float sfz = (float)sz;
+		nowPos = Vector3(sfx, 0.0f, sfz);
+		if (nowPos == testNodes[i]) {
+			return;
+		}
+
 		Vector3 a = testNodes[i - 1];
 		Vector3 b = testNodes[i];
+		
+		Vector3 startpos = Vector3(a.x - 45.0f, a.y, a.z - 45.0f);
+		Vector3 endpos = Vector3(b.x - 45.0f, b.y, b.z - 45.0f);
+		Debug::DrawLine(a, b, Vector4(0, 1, 0, 1));//change this startpos.x and y same on endpos//
+		Vector3 dirvec = b - a;
+		enemyball->GetPhysicsObject()->AddForce(dirvec*0.5);
+		
 
-		//Debug::DrawLine(a, b, Vector4(0, 1, 0, 1));//change this startpos.x and y same on endpos//
-		Debug::DrawLine(Vector3(a.x-45.0f,a.y,a.z-45.0f), Vector3(b.x-45.0f,b.y,b.z-45.0f), Vector4(0, 1, 0, 1));//change this startpos.x and y same on endpos//
+		//Debug::DrawLine(startpos,endpos, Vector4(0, 1, 0, 1));//draw path after shift
+		//Debug::DrawLine(Vector3(a.x-45.0f,a.y,a.z-45.0f), Vector3(b.x-45.0f,b.y,b.z-45.0f), Vector4(0, 1, 0, 1));//change this startpos.x and y same on endpos//
 	}
+}
+void TutorialGame::updateplayer(float dt) {
+	Vector3 startPos = enemyball->GetTransform().GetPosition();
+	int sx = (int)startPos.x;
+	int sz = (int)startPos.z;
+	float sfx = (float)sx;
+	float sfz = (float)sz;
+	startPos = Vector3(sfx, 0.0f, sfz);
+	
+	Vector3 endPos = ballplayer->GetTransform().GetPosition();
+	int ex = (int)endPos.x;
+	int ez = (int)endPos.z;
+	float efx = (float)ex;
+	float efz = (float)ez;
+	endPos = Vector3(efx, 0.0f, efz);
+	
+	if (dt * 100 / 2 > 8) {
+		map->FindPath(startPos, endPos, resultPath);
+		Vector3 pos;
+		while (resultPath.PopWaypoint(pos)) {
+			testNodes.push_back(pos + Vector3(0, 3, 0));
+		}
+		//DisplayPathfinding();
+	}
+	
+	DisplayPathfinding();
+}
+void TutorialGame::drawplayerenemy() {
+	Vector3 startPos = enemyball->GetTransform().GetPosition();
+	Vector3 endPos = ballplayer->GetTransform().GetPosition();
+	
+	Debug::DrawLine(startPos, endPos, Vector4(1, 1, 0, 1));
 }
 //coursework function end

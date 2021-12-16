@@ -32,6 +32,7 @@ namespace NCL {
 				}
 				return true;
 			}
+			
 			//coursework function end
 
 		protected:
@@ -45,17 +46,28 @@ namespace NCL {
 			void BuildCubeWall(float xAxisNum,float zAxisNum, Vector3 startpos, int cubenum, Vector3 cubeDimension, float inverseMass);
 			//coursework end
 			// 
+			void drawplayerenemy();
+			GameObject* ballplayer = nullptr;
+			GameObject* enemyball = nullptr;
+			NavigationPath resultPath;
+			//NavigationGrid* grid = nullptr;
+			void Getenemypos();
+			bool game1flag = false;
 			bool pathfound = false;
 			Vector3 playerpos;
 			Vector3 enemypos;
+			Vector3 nextnodepos;
+			void updateplayer(float dt);
 			void PathFinding();
 			void DisplayPathfinding();
 			vector <Vector3 > testNodes;//path finding
+			vector<Vector3>::iterator i;
 			GameObject* AddPlayer1ToWorld(const Vector3& position);
 			GameObject* AddEnemy1ToWorld(const Vector3& position);
 
 			GameObject* AddSpherePlayerToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
 			//state machine begin
+			StateGameObject* AddStateCapToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
 			StateGameObject* AddStateWallToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 0.0f);
 			StateGameObject* AddStateObjectToWorld(const Vector3& position);
 			StateGameObject* testStateObject = nullptr;
