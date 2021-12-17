@@ -119,15 +119,20 @@ void TutorialGame::UpdateGame(float dt) {
 			testStateObject1->Update(dt);
 		}
 		//state machine code end
-		if (pathfound) {
+		if (pathfound&&!physics->Getcatchflag()) {
+			updateplayer(dt);
 			DisplayPathfinding();//display path on the floor by green line
 			//updateplayer(dt);
 		//in the maze game, create player update(dt) func
 		//in this func, draw the path line with dt and position change
+			drawplayerenemy();
 		}
-		drawplayerenemy();
+		//drawplayerenemy();
 		if (game1flag) {
 			Debug::Print("Press 'Z' to active jumppad and icepad work", Vector2(5, 95), Vector4(1, 1, 1, 1));
+		}
+		if (physics->Getcatchflag()) {
+			Debug::Print("enemy catch you :)", Vector2(30, 60), Vector4(1, 1, 1, 1));
 		}
 
 		world->UpdateWorld(dt);
@@ -1179,6 +1184,7 @@ void TutorialGame::PathFinding() {
 	Vector3 pos;
 	while (outPath.PopWaypoint(pos)) {
 		testNodes.push_back(pos+Vector3(0,3,0));
+		pathNodes.push_back(pos + Vector3(0, 3, 0));
 	}
 	//i = testNodes.begin();
 }
@@ -1190,18 +1196,44 @@ void TutorialGame::DisplayPathfinding() {//path finding
 		float sfx = (float)sx;
 		float sfz = (float)sz;
 		nowPos = Vector3(sfx, 0.0f, sfz);
-		if (nowPos == testNodes[i]) {
+		if (abs(nowPos.x - ballplayer->GetTransform().GetPosition().x) <= 6.0f && abs(nowPos.z - ballplayer->GetTransform().GetPosition().z) <= 6.0f) {
+			//enemyball->GetPhysicsObject()->AddForce((ballplayer->GetTransform().GetPosition() - nowPos)*1.5f);
+			enemyball->GetPhysicsObject()->AddForce(nowPos-ballplayer->GetTransform().GetPosition());
 			return;
 		}
 
+		if (abs(nowPos.x - testNodes[i-1].x)<5.0f&& abs(nowPos.z - testNodes[i-1].z) < 5.0f) {
+			Vector3 a = testNodes[i - 1];
+			Vector3 b = testNodes[i];
+			Vector3 startpos = Vector3(a.x - 45.0f, a.y, a.z - 45.0f);
+			Vector3 endpos = Vector3(b.x - 45.0f, b.y, b.z - 45.0f);
+			Debug::DrawLine(a, b, Vector4(0, 1, 0, 1));//change this startpos.x and y same on endpos//
+			//b.y = 0.0f;
+			Vector3 dirvec = b - a;
+			enemyball->GetPhysicsObject()->ClearForces();
+			enemyball->GetPhysicsObject()->AddForce(dirvec * 2.2f);
+			//enemyball->GetPhysicsObject()->AddForce(dirvec * 0.1f);//good speed
+			ballplayer->GetTransform().GetPosition();
+			
+		}
+		
+		//if (nowPos == testNodes[i]) {
+		//	return;
+		//}
+		//zhushi
+		/*
 		Vector3 a = testNodes[i - 1];
 		Vector3 b = testNodes[i];
 		
 		Vector3 startpos = Vector3(a.x - 45.0f, a.y, a.z - 45.0f);
 		Vector3 endpos = Vector3(b.x - 45.0f, b.y, b.z - 45.0f);
 		Debug::DrawLine(a, b, Vector4(0, 1, 0, 1));//change this startpos.x and y same on endpos//
-		Vector3 dirvec = b - a;
-		enemyball->GetPhysicsObject()->AddForce(dirvec*0.5);
+		b.y = 0.0f;
+		Vector3 dirvec = b - nowPos;
+		enemyball->GetPhysicsObject()->AddForce(dirvec*0.3f);
+		*/
+		//zhushi
+		//enemyball->GetPhysicsObject()->ApplyLinearImpulse(dirvec * 0.02);
 		
 
 		//Debug::DrawLine(startpos,endpos, Vector4(0, 1, 0, 1));//draw path after shift
@@ -1223,16 +1255,14 @@ void TutorialGame::updateplayer(float dt) {
 	float efz = (float)ez;
 	endPos = Vector3(efx, 0.0f, efz);
 	
-	if (dt * 100 / 2 > 8) {
-		map->FindPath(startPos, endPos, resultPath);
-		Vector3 pos;
-		while (resultPath.PopWaypoint(pos)) {
+	map->FindPath(startPos, endPos, resultPath);
+	Vector3 pos;
+	while (resultPath.PopWaypoint(pos)) {
 			testNodes.push_back(pos + Vector3(0, 3, 0));
-		}
-		//DisplayPathfinding();
 	}
+		//DisplayPathfinding();
 	
-	DisplayPathfinding();
+	//DisplayPathfinding();
 }
 void TutorialGame::drawplayerenemy() {
 	Vector3 startPos = enemyball->GetTransform().GetPosition();

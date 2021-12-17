@@ -61,6 +61,7 @@ namespace NCL {
 			void PathFinding();
 			void DisplayPathfinding();
 			vector <Vector3 > testNodes;//path finding
+			vector <Vector3> pathNodes;
 			vector<Vector3>::iterator i;
 			GameObject* AddPlayer1ToWorld(const Vector3& position);
 			GameObject* AddEnemy1ToWorld(const Vector3& position);

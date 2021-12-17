@@ -26,7 +26,20 @@ namespace NCL {
 			void SetGravity(const Vector3& g);
 
 			void SetNum();
+			void Setenemycatch();
+			bool Getcatchflag();
+			bool Getenemycatch() {
+				return ecatch;
+			}
+			void Setenemycatchtrue() {
+				ecatch = true;
+			}
+			void Setenemycatchfalse() {
+				ecatch = false;
+			}
+			
 		protected:
+			bool ecatch = false;
 			void BasicCollisionDetection();
 			void BroadPhase();
 			void NarrowPhase();

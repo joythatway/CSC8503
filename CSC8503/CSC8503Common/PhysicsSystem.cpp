@@ -74,11 +74,19 @@ float realDT	= idealDT;
 bool winorlose = false;//win or lose
 bool lose = false;
 int score = 0;
+bool enemycatch = false;
+void PhysicsSystem::Setenemycatch(){
+	enemycatch = true;
+}
 
+bool PhysicsSystem::Getcatchflag() {
+	return enemycatch;
+}
 void PhysicsSystem::SetNum() {
 	winorlose = false;
 	lose = false;
 	score = 0;
+	enemycatch = false;
 }
 void PhysicsSystem::Update(float dt) {	
 	if (winorlose == true&&lose==false) {
@@ -372,7 +380,14 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 	if (a.GetName() == "spinright" && b.GetName() == "sphereplayer") {
 		Spinpad(a, b, p);
 	}
-
+	if (a.GetName() == "ballplayer" && b.GetName() == "enemyball") {
+		enemycatch = true;
+		Debug::Print("enemy catch you :)", Vector2(50, 65), Vector4(1, 1, 1, 1));
+	}
+	if (a.GetName() == "enemyball" && b.GetName() == "ballplayer") {
+		enemycatch = true;
+	}
+	
 
 
 	PhysicsObject* physA = a.GetPhysicsObject();

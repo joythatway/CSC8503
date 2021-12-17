@@ -541,7 +541,7 @@ bool CollisionDetection::AABBCapsuleIntersection(//AABB-Capsule
 	Vector3 capsulePos = worldTransformB.GetPosition();
 	Vector3 upVector = worldTransformB.GetOrientation() * Vector3(0, 1, 0);
 	SphereVolume tempSphere = SphereVolume(volumeB.GetRadius());
-	///Northern
+	
 	Vector3 topPos = capsulePos + upVector * (volumeB.GetHalfHeight() - volumeB.GetRadius());
 	Vector3 vA = topPos - AABBPos;
 	Vector3 vB = topPos - capsulePos;
@@ -556,7 +556,6 @@ bool CollisionDetection::AABBCapsuleIntersection(//AABB-Capsule
 		collisionInfo.point.localB = Vector3();
 		return coll;
 	}
-	/// Southern
 	Vector3 botPos = capsulePos - upVector * (volumeB.GetHalfHeight() - volumeB.GetRadius());
 	vA = botPos - AABBPos;
 	vB = botPos - capsulePos;
@@ -613,7 +612,7 @@ bool CollisionDetection::SphereCapsuleIntersection(//Sphere-Capsule
 	Vector3 capsulePos = worldTransformA.GetPosition();
 	Vector3 spherePos = worldTransformB.GetPosition();
 	Vector3 upVector = worldTransformA.GetOrientation() * Vector3(0, 1, 0);
-	// Northern 
+	
 	Vector3 topPos = capsulePos + upVector * (volumeA.GetHalfHeight() - volumeA.GetRadius());
 	Vector3 vA = topPos - spherePos;
 	Vector3 vB = topPos - capsulePos;
@@ -623,7 +622,7 @@ bool CollisionDetection::SphereCapsuleIntersection(//Sphere-Capsule
 		Transform tempTransform = Transform(worldTransformA);
 		tempTransform.SetPosition(topPos);
 
-		// point in northen hemisphere
+		
 		SphereVolume tempSphere = SphereVolume(volumeA.GetRadius());
 
 		bool cool = SphereIntersection(tempSphere, tempTransform, volumeB, worldTransformB, collisionInfo);
@@ -638,14 +637,14 @@ bool CollisionDetection::SphereCapsuleIntersection(//Sphere-Capsule
 			return false;
 		}
 	}
-	// Soutern 
+	 
 	Vector3 botPos = capsulePos - upVector * (volumeA.GetHalfHeight() - volumeA.GetRadius());
 	vA = botPos - spherePos;
 	vB = botPos - capsulePos;
 	isPointInhemisphere = Vector3::Dot(vA, vB);
 	if (isPointInhemisphere < 0)
 	{
-		// point in southern hemisphere
+		
 		SphereVolume tempSphere = SphereVolume(volumeA.GetRadius());
 		Transform tempTransform = Transform(worldTransformA);
 		bool coll = SphereIntersection(tempSphere, tempTransform, volumeB, worldTransformB, collisionInfo);
@@ -671,7 +670,7 @@ bool CollisionDetection::SphereCapsuleIntersection(//Sphere-Capsule
 		Vector3 localB = -normal * volumeB.GetRadius();
 		collisionInfo.AddContactPoint(localA, localB, normal, penetration);
 		collisionInfo.point.localA = Vector3();
-		return true;// we 're colliding !
+		return true;
 	}
 	return false;
 }
