@@ -332,6 +332,19 @@ void PhysicsSystem::Spinpad(GameObject& a, GameObject& b, CollisionDetection::Co
 		physA->SetAngularVelocity(Vector3(0, 1, 0) * 3);
 	}
 }
+void PhysicsSystem::penaltyresolvecollision(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p)const {
+	PhysicsObject* physA = a.GetPhysicsObject();
+	PhysicsObject* physB = b.GetPhysicsObject();
+
+	float totalMass = physA->GetInverseMass() + physB->GetInverseMass();
+	if (totalMass == 0) {
+		return;
+	}
+	float k = 150.0f;
+	Vector3 force = p.normal * p.penetration * -k;
+	physA->AddForceAtPosition(force, p.localA + a.GetTransform().GetPosition());
+	physB->AddForceAtPosition(-force, p.localB + b.GetTransform().GetPosition());
+}
 void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const {
 
 	if (a.GetName() == "jumppad" && b.GetName() == "sphereplayer") {

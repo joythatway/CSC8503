@@ -59,6 +59,7 @@ namespace NCL {
 			void icepad(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const;
 			void Endpad(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const;
 			void Spinpad(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const;
+			void penaltyresolvecollision(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p)const;
 			
 
 			GameWorld& gameWorld;
