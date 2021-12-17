@@ -78,7 +78,8 @@ TutorialGame::~TutorialGame()	{
 void TutorialGame::UpdateGame(float dt) {
 	glClearColor(1, 1, 1, 1);
 	if (dt == 0) {
-		renderer->DrawString("Game Paused (ESC)", Vector2(30, 10));
+		renderer->DrawString("Game Paused (ESC)", Vector2(25, 50),Vector4(0,0,0,1),30.0f);
+		renderer->DrawString("Press 'ESC' continue game", Vector2(20, 60), Vector4(0, 0, 0, 1), 25.0f);
 	}
 	else {
 		if (!inSelectionMode) {
@@ -127,6 +128,10 @@ void TutorialGame::UpdateGame(float dt) {
 		//in this func, draw the path line with dt and position change
 			drawplayerenemy();
 		}
+		if (physics->Getcatchflag()) {
+			resetenemy();
+		}
+		//resetenemy();
 		//drawplayerenemy();
 		if (game1flag) {
 			Debug::Print("Press 'Z' to active jumppad and icepad work", Vector2(5, 95), Vector4(1, 1, 1, 1));
@@ -851,10 +856,10 @@ void TutorialGame::MoveSelectedObject() {
 void TutorialGame::DrawMenu() {
 	glClearColor(0, 0, 0, 1);
 	Debug::FlushRenderables(0);
-	renderer->DrawString("Welcome to game", Vector2(10, 10));
-	renderer->DrawString("Press '1' for game", Vector2(10, 20));
-	renderer->DrawString("Press '2' for AI game", Vector2(10, 30));
-	renderer->DrawString("Press '3' for xx game", Vector2(10, 40));
+	renderer->DrawString("Welcome to game", Vector2(15, 30),Vector4(0,0,0,1),50.0f);
+	renderer->DrawString("Press '1' for game", Vector2(25, 50), Vector4(0, 0, 0, 1), 25.0f);
+	renderer->DrawString("Press '2' for AI game", Vector2(25, 60), Vector4(0, 0, 0, 1), 25.0f);
+	renderer->DrawString("Press 'ESC' exit game", Vector2(25, 70), Vector4(0, 0, 0, 1), 25.0f);
 	renderer->Render();
 	world->ClearAndErase();
 	//enemies.clear();
@@ -911,9 +916,9 @@ void TutorialGame::InitGameWorld1() {//ball
 	AddSpin(Vector3(3, 9, 15), Vector3(1, 2, 14.5), Quaternion(0, 1, 0, 1), 10.0f,"spinright");
 	AddSpin(Vector3(3, 9, -15), Vector3(1, 2, 14.5), Quaternion(0, 1, 0, 1), 10.0f,"spinleft");
 	//AddInclinePad(Vector3(-30, 0, -30), Vector3(20, 20, 20), Quaternion(1, 0, 0, 3), 0.0f);
-	AddCapsuleToWorld(Vector3(60, 20, 60), 6.0f, 5.0f, 5.0f);
-	AddCapsuleToWorld(Vector3(70, 30, 70), 9.0f, 5.0f, 5.0f);
-	AddSphereToWorld(Vector3(70, 40, 70), 5.0f, 5.0f);
+	//AddCapsuleToWorld(Vector3(60, 20, 60), 6.0f, 5.0f, 5.0f);
+	//AddCapsuleToWorld(Vector3(70, 30, 70), 9.0f, 5.0f, 5.0f);
+	//AddSphereToWorld(Vector3(70, 40, 70), 5.0f, 5.0f);
 }
 void TutorialGame::InitGameWorld2() {//maze
 	InitialiseAssets();//add assets first
@@ -1213,7 +1218,7 @@ void TutorialGame::DisplayPathfinding() {//path finding
 			enemyball->GetPhysicsObject()->ClearForces();
 			enemyball->GetPhysicsObject()->AddForce(dirvec * 2.2f);
 			//enemyball->GetPhysicsObject()->AddForce(dirvec * 0.1f);//good speed
-			ballplayer->GetTransform().GetPosition();
+			//ballplayer->GetTransform().GetPosition();
 			
 		}
 		
@@ -1269,5 +1274,12 @@ void TutorialGame::drawplayerenemy() {
 	Vector3 endPos = ballplayer->GetTransform().GetPosition();
 	
 	Debug::DrawLine(startPos, endPos, Vector4(1, 1, 0, 1));
+}
+void TutorialGame::resetenemy() {
+	Vector3 enemypos = enemyball->GetTransform().GetPosition();
+	if (enemypos.y <= -10.0f) {
+		enemyball->GetTransform().SetPosition(Vector3(80, 2, 0));
+		physics->SetNum();
+	}
 }
 //coursework function end

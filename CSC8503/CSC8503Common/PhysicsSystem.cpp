@@ -351,6 +351,7 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 		//Debug::Print("Press 'Z' to active jumppad work", Vector2(10, 100), Vector4(1, 1, 1, 1));
 		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::Z)) {
 			jumppad(a, b, p);
+			penaltyresolvecollision(a, b, p);
 		}
 	}
 	if (a.GetName() == "icepad" && b.GetName() == "sphereplayer") {

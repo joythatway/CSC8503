@@ -75,6 +75,9 @@ namespace NCL {
 				return inverseInteriaTensor;
 			}
 
+			float GetFriction() {
+				return friction;
+			}
 		protected:
 			const CollisionVolume* volume;
 			Transform*		transform;

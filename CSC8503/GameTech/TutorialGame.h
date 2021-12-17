@@ -47,6 +47,7 @@ namespace NCL {
 			//coursework end
 			// 
 			void drawplayerenemy();
+			void resetenemy();
 			GameObject* ballplayer = nullptr;
 			GameObject* enemyball = nullptr;
 			NavigationPath resultPath;
